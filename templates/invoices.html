@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoices</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body onload="loadInvoices()">
+
+<div class="navbar">
+    <h2>Invoices</h2>
+    <a href="/dashboard">Dashboard</a>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+
+    <select id="ownerFilter">
+        <option value="">All Owners</option>
+    </select>
+
+    <select id="dateSort">
+        <option value="">Sort By Date</option>
+        <option value="start">Start Date</option>
+        <option value="end">End Date</option>
+    </select>
+
+    <select id="financialSort">
+        <option value="">Sort By Financial</option>
+        <option value="amount">Amount</option>
+        <option value="due">Balance Due</option>
+    </select>
+
+    <select id="ageingSort">
+        <option value="">Sort By Ageing</option>
+        <option value="ageing">Ageing</option>
+    </select>
+
+    <select id="order">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+    </select>
+
+    <button onclick="applyFilters()">Apply</button>
+
+</div>
+
+<div id="noDataMessage" class="hidden message">
+    No data found.
+</div>
+
+<table>
+<thead>
+<tr>
+    <th>Transaction No</th>
+    <th>Customer</th>
+    <th>Amount</th>
+    <th>Balance Due</th>
+    <th>Start Date</th>
+    <th>End Date</th>
+    <th>Ageing</th>
+    <th>Owner</th>
+    <th>Status</th>
+</tr>
+</thead>
+
+<tbody id="invoiceTableBody"></tbody>
+</table>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>

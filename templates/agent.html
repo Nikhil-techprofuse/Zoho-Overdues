@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Wise Data</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body onload="loadAgentPage()">
+
+<div class="navbar">
+    <h2>Agent Wise Data</h2>
+    <a href="/dashboard">Dashboard</a>
+</div>
+
+<div class="page-container">
+
+<table class="modern-table">
+<thead>
+<tr>
+    <th>Agent Name</th>
+    <th>Total Amount</th>
+    <th>Total Due</th>
+    <th>No. of Invoices</th>
+</tr>
+</thead>
+
+<tbody id="agentTable"></tbody>
+</table>
+
+</div>
+
+<div id="agentPopup" class="popup hidden"></div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>

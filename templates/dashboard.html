@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body onload="loadDashboard()">
+
+<header class="navbar">
+    <div>
+        <h2>Invoice Dashboard</h2>
+    </div>
+    <div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<main class="dashboard-container">
+
+    <!-- FIRST ROW -->
+    <div class="dashboard-row">
+        <div class="card">
+            <h4>Total Invoice Value</h4>
+            <p id="totalValue" class="card-value">₹ 0</p>
+        </div>
+
+        <div class="card">
+            <h4>Total Due Amount</h4>
+            <p id="totalDue" class="card-value">₹ 0</p>
+        </div>
+    </div>
+
+    <!-- SECOND ROW -->
+    <div class="dashboard-row three-cards">
+
+        <div class="card clickable" onclick="goToAgentPage()">
+            <h4>Agent Wise Data</h4>
+            <p class="card-value">View</p>
+            <span class="card-action">Open →</span>
+        </div>
+
+        <div class="card clickable" onclick="goToInvoices()">
+            <h4>No. of Invoices</h4>
+            <p id="totalInvoices" class="card-value">0</p>
+            <span class="card-action">View →</span>
+        </div>
+
+        <div class="card clickable highlight-card" onclick="goToCustomers()">
+            <h4>Unique Customers</h4>
+            <p id="uniqueCustomers" class="card-value">0</p>
+            <span class="card-action">Explore →</span>
+        </div>
+
+    </div>
+
+</main>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
