@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Upload Data</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .upload-container {
+            max-width: 450px;
+            margin: 50px auto;
+            padding: 24px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .upload-box {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-box:hover {
+            border-color: #007bff;
+        }
+
+        .btn-upload {
+            background: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-upload:disabled {
+            background: #ccc;
+        }
+
+        #statusMessage {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* === COMMENT MODAL === */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 480px;
+            max-width: 95vw;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-box h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #1976d2;
+            border-bottom: 1px solid #e3f2fd;
+            padding-bottom: 10px;
+        }
+
+        .modal-box textarea {
+            width: 100%;
+            height: 160px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+
+        .modal-box textarea:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-modal-save {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-modal-delete {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-modal-cancel {
+            background: #eee;
+            color: #333;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-comment-open {
+            background: none;
+            border: 1px solid #1976d2;
+            color: #1976d2;
+            padding: 3px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .btn-comment-open.has-comment {
+            background: #e3f2fd;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <!-- LEFT: Brand -->
+        <a class="navbar-brand" href="/upload-page">
+            Zoho Overdues
+        </a>
+
+        <!-- CENTER: Navigation -->
+        <div class="navbar-nav">
+            <a href="/upload-page" class="active">Upload</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/customers-page">Customers</a>
+            <a href="/agent-page">Agents</a>
+        </div>
+
+        <!-- RIGHT: Date + Profile -->
+        <div class="navbar-right">
+            <span class="navbar-date" id="todayDateDisplay"></span>
+
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">
+                    {{ username[0] if username else 'U' }}
+                </div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="upload-container">
+        <h1>Upload Everyday Sheet</h1>
+        <p>Supported formats: .csv, .xlsx, .xls</p>
+
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+            <p id="fileNameDisplay">Click or Drag & Drop file here</p>
+            <input type="file" id="fileInput" class="hidden" accept=".csv, .xlsx, .xls" onchange="updateFileName()">
+        </div>
+
+        <button id="uploadBtn" class="btn-upload" onclick="handleUpload()">Upload & Sync Data</button>
+
+        <div id="statusMessage" class="hidden"></div>
+    </div>
+
+    <div class="page-container" style="margin-top: -30px;">
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 40px 0;">
+
+        <h2 style="text-align: center; color: #333;">Daily Dashboard (Uploaded Data)</h2>
+
+        <!-- SUMMARY CARDS -->
+        <div class="dashboard-row"
+            style="margin-bottom: 30px; gap: 30px; display: flex; justify-content: center; flex-wrap: wrap;">
+            <div class="card" style="height: 120px; width: 220px; padding: 15px;">
+                <h4 style="margin: 0; color: #666;">Total Value</h4>
+                <p id="dailyTotalValue" class="card-value" style="font-size: 22px; color: #007bff; margin-top: 10px;">₹
+                    0</p>
+            </div>
+            <div class="card" style="height: 120px; width: 220px; padding: 15px;">
+                <h4 style="margin: 0; color: #666;">Total Due</h4>
+                <p id="dailyTotalDue" class="card-value" style="font-size: 22px; color: #dc3545; margin-top: 10px;">₹ 0
+                </p>
+            </div>
+            <div class="card" style="height: 120px; width: 220px; padding: 15px;">
+                <h4 style="margin: 0; color: #666;">Records</h4>
+                <p id="dailyCount" class="card-value" style="font-size: 22px; margin-top: 10px;">0</p>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters"
+            style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <input type="text" id="custFilter" placeholder="Search Customer, Agent or Txn..."
+                style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 180px;">
+
+            <select id="statusFilter" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">All Statuses</option>
+                <option value="overdue">Overdue</option>
+                <option value="sent">Sent</option>
+            </select>
+
+            <select id="ageingFilter" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">All Ageing</option>
+                <option value="1-15 days">1-15 Days</option>
+                <option value="16-30 days">16-30 Days</option>
+                <option value="31-45 days">31-45 Days</option>
+                <option value="46-60 days">46-60 Days</option>
+                <option value="above 60 days">Above 60 Days</option>
+            </select>
+
+            <select id="ownerFilter" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">All Owners</option>
+            </select>
+
+            <select id="sortField" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="amount">Sort by Amount</option>
+                <option value="due" selected>Sort by Balance Due</option>
+                <option value="customer">Sort by Customer</option>
+                <option value="age">Sort by Age</option>
+            </select>
+
+            <select id="sortOrder" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+            </select>
+
+            <button onclick="applyDailyFilters()"
+                style="background: #28a745; border: none; padding: 10px 25px; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;">Apply
+                Filters</button>
+
+            <a href="/download-data"
+                style="background: #1976d2; border: none; padding: 10px 20px; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                &#8595; Download Excel
+            </a>
+        </div>
+
+        <div class="table-container">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Transaction No</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Customer</th>
+                        <th>Domain</th>
+                        <th>Amount</th>
+                        <th>Balance Due</th>
+                        <th>Age</th>
+                        <th>Ageing</th>
+                        <th>Status</th>
+                        <th>Owner</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Custom Status</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody id="dailyTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let dailyData = [];
+
+        window.onload = () => {
+            // Set Today's Date in Navbar
+            const today = new Date();
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('todayDateDisplay').innerText = "Today: " + today.toLocaleDateString('en-IN', options);
+
+            loadUploadedData();
+        };
+
+        function populateOwnerDropdown(data) {
+            const owners = [...new Set(data.map(i => i.owner).filter(Boolean))];
+            const dropdown = document.getElementById("ownerFilter");
+            dropdown.innerHTML = `<option value="">All Owners</option>`;
+            owners.forEach(o => {
+                dropdown.innerHTML += `<option value="${o}">${o}</option>`;
+            });
+        }
+
+        async function loadUploadedData() {
+            try {
+                const res = await fetch('/uploaded-data');
+                dailyData = await res.json();
+
+                populateOwnerDropdown(dailyData);
+                updateSummary(dailyData);
+                renderDailyTable(dailyData);
+            } catch (err) {
+                console.error("Failed to load daily data", err);
+            }
+        }
+
+        function updateSummary(data) {
+            const totalValue = data.reduce((sum, i) => sum + (i.amount || 0), 0);
+            const totalDue = data.reduce((sum, i) => sum + (i.due || 0), 0);
+
+            document.getElementById('dailyTotalValue').innerText = "₹ " + totalValue.toLocaleString("en-IN");
+            document.getElementById('dailyTotalDue').innerText = "₹ " + totalDue.toLocaleString("en-IN");
+            document.getElementById('dailyCount').innerText = data.length;
+        }
+
+        function renderDailyTable(data) {
+            const table = document.getElementById('dailyTableBody');
+            table.innerHTML = "";
+
+            if (data.length === 0) {
+                table.innerHTML = "<tr><td colspan='15'>No records found</td></tr>";
+                return;
+            }
+
+            data.forEach(i => {
+                const statusTag = i.status === 'overdue' ? `<span class="tag tag-overdue">Overdue</span>` : `<span class="tag tag-sent">${i.status || 'Sent'}</span>`;
+
+                // Clean dates
+                const cleanDate = (i.date || "").split(" ")[0];
+                const cleanStart = (i.start || "").split(" ")[0];
+                const cleanEnd = (i.end || "").split(" ")[0];
+
+                const statusOptions = ['Pending', 'Paid', 'Not Paid', 'Not Updated', 'Others'];
+                const csOpts = statusOptions.map(s =>
+                    `<option value="${s}" ${i.custom_status === s ? 'selected' : ''}>${s}</option>`
+                ).join('');
+
+                table.innerHTML += `
+                <tr>
+                    <td style="font-weight: bold;">${i.invoice}</td>
+                    <td>${cleanDate}</td>
+                    <td>${i.type}</td>
+                    <td>${i.customer}</td>
+                    <td style="font-size: 11px;">${i.domain}</td>
+                    <td style="font-weight: 500;">₹ ${Number(i.amount).toLocaleString("en-IN")}</td>
+                    <td style="font-weight: 600; color: #d32f2f;">₹ ${Number(i.due).toLocaleString("en-IN")}</td>
+                    <td>${i.age}</td>
+                    <td>${i.ageing}</td>
+                    <td>${statusTag}</td>
+                    <td>${i.owner}</td>
+                    <td><span class="date-highlight">${cleanStart}</span></td>
+                    <td><span class="date-highlight">${cleanEnd}</span></td>
+                    <td>
+                        <select class="custom-status-select" onchange="updateStatus(${i.id}, this.value)">
+                            ${csOpts}
+                        </select>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:4px; align-items:center;">
+                            <button class="btn-comment-open ${i.comments ? 'has-comment' : ''}" onclick="openCommentModal(${i.id}, \`${(i.comments || '').replace(/`/g, "'")
+                    }\`, \`${(i.customer || '').replace(/`/g, "'")}\`)">
+                                ${i.comments ? '💬 Edit' : '💬 Add'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function applyDailyFilters() {
+            let filtered = [...dailyData];
+            const cust = document.getElementById('custFilter').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const ageing = document.getElementById('ageingFilter').value;
+            const owner = document.getElementById('ownerFilter').value;
+            const sortField = document.getElementById('sortField').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+
+            if (cust) {
+                // Search in Customer, Invoice/Transaction#, and Owner
+                filtered = filtered.filter(i =>
+                    (i.customer || "").toLowerCase().includes(cust) ||
+                    (i.invoice || "").toLowerCase().includes(cust) ||
+                    (i.owner || "").toLowerCase().includes(cust)
+                );
+            }
+            if (status) {
+                filtered = filtered.filter(i => i.status === status);
+            }
+            if (ageing) {
+                filtered = filtered.filter(i => i.ageing.toLowerCase() === ageing.toLowerCase());
+            }
+            if (owner) {
+                filtered = filtered.filter(i => i.owner === owner);
+            }
+
+            filtered.sort((a, b) => {
+                let valA = a[sortField];
+                let valB = b[sortField];
+
+                if (['amount', 'due', 'age'].includes(sortField)) {
+                    valA = Number(valA) || 0;
+                    valB = Number(valB) || 0;
+                } else if (typeof valA === 'string') {
+                    valA = valA.toLowerCase();
+                    valB = valB.toLowerCase();
+                }
+
+                if (sortOrder === 'asc') return valA > valB ? 1 : -1;
+                else return valA < valB ? 1 : -1;
+            });
+
+            renderDailyTable(filtered);
+            updateSummary(filtered);
+        }
+
+        async function updateStatus(id, value) {
+            await fetch(`/update-record/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ custom_status: value })
+            });
+        }
+
+        let _activeCommentId = null;
+
+        function openCommentModal(id, currentComment, customerName) {
+            _activeCommentId = id;
+            document.getElementById('modalCustomerName').innerText = customerName || 'Invoice';
+            document.getElementById('modalCommentText').value = currentComment || '';
+            document.getElementById('commentModal').classList.add('open');
+            document.getElementById('modalCommentText').focus();
+        }
+
+        function closeCommentModal() {
+            document.getElementById('commentModal').classList.remove('open');
+            _activeCommentId = null;
+        }
+
+        async function saveModalComment() {
+            if (!_activeCommentId) return;
+            const value = document.getElementById('modalCommentText').value;
+            const res = await fetch(`/update-record/${_activeCommentId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ comments: value })
+            });
+            if (res.ok) {
+                closeCommentModal();
+                loadUploadedData();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Failed to save comment');
+            }
+        }
+
+        async function deleteComment() {
+            if (!_activeCommentId) return;
+            if (!confirm('Clear this comment?')) return;
+            const res = await fetch(`/update-record/${_activeCommentId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ comments: '' })
+            });
+            if (res.ok) {
+                closeCommentModal();
+                loadUploadedData();
+            }
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('fileInput');
+            const display = document.getElementById('fileNameDisplay');
+            if (input.files.length > 0) {
+                display.innerText = input.files[0].name;
+            }
+        }
+
+        async function handleUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const btn = document.getElementById('uploadBtn');
+            const status = document.getElementById('statusMessage');
+
+            if (fileInput.files.length === 0) {
+                alert("Please select a file first");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            btn.disabled = true;
+            btn.innerText = "Uploading...";
+            status.className = "hidden";
+
+            try {
+                const res = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await res.json();
+
+                status.classList.remove('hidden');
+                if (res.ok) {
+                    status.className = "success";
+                    status.innerText = result.message || "Upload successful!";
+                    loadUploadedData(); // Refresh the table
+                } else {
+                    status.className = "error";
+                    status.innerText = result.error || "Upload failed";
+                }
+            } catch (err) {
+                status.classList.remove('hidden');
+                status.className = "error";
+                status.innerText = "Network error occurred";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Upload & Sync Data";
+            }
+        }
+
+        async function logout() {
+            await fetch("/logout", { credentials: "include" });
+            window.location = "/";
+        }
+    </script>
+
+    <!-- COMMENT MODAL -->
+    <div id="commentModal" class="modal-overlay" onclick="if(event.target===this) closeCommentModal()">
+        <div class="modal-box">
+            <h3>&#128172; Comment — <span id="modalCustomerName" style="color:#333;"></span></h3>
+            <textarea id="modalCommentText"
+                placeholder="Add your notes, follow-up updates, or payment status details here..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeCommentModal()">Cancel</button>
+                <button class="btn-modal-delete" onclick="deleteComment()">&#128465; Delete</button>
+                <button class="btn-modal-save" onclick="saveModalComment()">&#10003; Save</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

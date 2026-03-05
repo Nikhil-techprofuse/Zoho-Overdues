@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,55 +10,54 @@
 
 <body onload="loadDashboard()">
 
-<header class="navbar">
-    <div>
-        <h2>Invoice Dashboard</h2>
-    </div>
-    <div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-</header>
+    <header class="navbar">
+        <a class="navbar-brand" href="/upload-page">
+            Zoho Overdues
+        </a>
+        <div class="navbar-nav">
+            <a href="/upload-page">Upload</a>
+            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/customers-page">Customers</a>
+            <a href="/agent-page">Agents</a>
+        </div>
+        <div class="navbar-right">
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">
+                    {{ username[0] if username else 'U' }}
+                </div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-<main class="dashboard-container">
+    <main class="dashboard-container">
 
-    <!-- FIRST ROW -->
-    <div class="dashboard-row">
-        <div class="card">
-            <h4>Total Invoice Value</h4>
-            <p id="totalValue" class="card-value">₹ 0</p>
+        <!-- SECOND ROW -->
+        <div class="dashboard-row">
+
+            <div class="card clickable" onclick="goToAgentPage()">
+                <h4>Agent Wise Data</h4>
+                <p class="card-value">View</p>
+                <span class="card-action">Open →</span>
+            </div>
+
+            <div class="card clickable highlight-card" onclick="goToCustomers()">
+                <h4>Unique Customers</h4>
+                <p id="uniqueCustomers" class="card-value">0</p>
+                <span class="card-action">View Breakdown →</span>
+            </div>
+
         </div>
 
-        <div class="card">
-            <h4>Total Due Amount</h4>
-            <p id="totalDue" class="card-value">₹ 0</p>
-        </div>
-    </div>
+    </main>
 
-    <!-- SECOND ROW -->
-    <div class="dashboard-row three-cards">
-
-        <div class="card clickable" onclick="goToAgentPage()">
-            <h4>Agent Wise Data</h4>
-            <p class="card-value">View</p>
-            <span class="card-action">Open →</span>
-        </div>
-
-        <div class="card clickable" onclick="goToInvoices()">
-            <h4>No. of Invoices</h4>
-            <p id="totalInvoices" class="card-value">0</p>
-            <span class="card-action">View →</span>
-        </div>
-
-        <div class="card clickable highlight-card" onclick="goToCustomers()">
-            <h4>Unique Customers</h4>
-            <p id="uniqueCustomers" class="card-value">0</p>
-            <span class="card-action">Explore →</span>
-        </div>
-
-    </div>
-
-</main>
-
-<script src="/static/script.js"></script>
+    <script src="/static/script.js"></script>
 </body>
+
 </html>

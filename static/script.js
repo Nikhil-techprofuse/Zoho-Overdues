@@ -5,6 +5,19 @@
 let invoiceData = [];
 let customerCache = [];
 
+// ======================================================
+// INITIALIZATION
+// ======================================================
+
+document.addEventListener("DOMContentLoaded", () => {
+    const dateDisplay = document.getElementById("todayDateDisplay");
+    if (dateDisplay) {
+        const today = new Date();
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        dateDisplay.innerText = today.toLocaleDateString('en-IN', options);
+    }
+});
+
 
 // ======================================================
 // NAVIGATION
@@ -35,13 +48,13 @@ async function login() {
 
     const res = await fetch("/login", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({username, password})
+        body: JSON.stringify({ username, password })
     });
 
     if (res.ok)
-        window.location = "/dashboard";
+        window.location = "/upload-page";
     else
         error.innerText = "Invalid Credentials";
 }
@@ -52,7 +65,7 @@ async function login() {
 // ======================================================
 
 async function logout() {
-    await fetch("/logout", {credentials: "include"});
+    await fetch("/logout", { credentials: "include" });
     window.location = "/";
 }
 
@@ -218,6 +231,7 @@ function renderTable(data) {
         table.innerHTML += `
         <tr>
             <td>${i.invoice}</td>
+            <td>${i.type}</td>
             <td>${i.customer}</td>
             <td>₹ ${Number(i.amount).toLocaleString("en-IN")}</td>
             <td>₹ ${Number(i.due).toLocaleString("en-IN")}</td>
@@ -288,7 +302,7 @@ function hidePopup() {
 
 // ================= AGENT PAGE NAVIGATION =================
 
-function goToAgentPage(){
+function goToAgentPage() {
     window.location = "/agent-page";
 }
 
@@ -296,10 +310,10 @@ function goToAgentPage(){
 
 let agentCache = [];
 
-async function loadAgentPage(){
+async function loadAgentPage() {
 
     const res = await fetch("/agent-data", {
-        credentials:"include"
+        credentials: "include"
     });
 
     agentCache = await res.json();
@@ -324,7 +338,7 @@ async function loadAgentPage(){
 
 // ================= AGENT POPUP =================
 
-function showAgentPopup(event, name){
+function showAgentPopup(event, name) {
 
     const popup = document.getElementById("agentPopup");
 
@@ -334,7 +348,7 @@ function showAgentPopup(event, name){
     html += `<p><b>Total Amount:</b> ₹ ${agent.total_amount.toLocaleString("en-IN")}</p>`;
     html += `<p><b>Total Due:</b> ₹ ${agent.total_due.toLocaleString("en-IN")}</p><hr>`;
 
-    agent.invoices.forEach(inv=>{
+    agent.invoices.forEach(inv => {
         html += `<div>${inv.invoice} | ${inv.customer} | ₹${inv.due.toLocaleString("en-IN")}</div>`;
     });
 
@@ -344,6 +358,6 @@ function showAgentPopup(event, name){
     popup.classList.remove("hidden");
 }
 
-function hideAgentPopup(){
+function hideAgentPopup() {
     document.getElementById("agentPopup").classList.add("hidden");
 }

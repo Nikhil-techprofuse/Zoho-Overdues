@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Agent Wise Data</title>
@@ -8,31 +9,58 @@
 
 <body onload="loadAgentPage()">
 
-<div class="navbar">
-    <h2>Agent Wise Data</h2>
-    <a href="/dashboard">Dashboard</a>
-</div>
+    <nav class="navbar">
+        <!-- LEFT: Brand -->
+        <a class="navbar-brand" href="/upload-page">
+            Zoho Overdues
+        </a>
 
-<div class="page-container">
+        <!-- CENTER: Navigation -->
+        <div class="navbar-nav">
+            <a href="/upload-page">Upload</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/customers-page">Customers</a>
+            <a href="/agent-page" class="active">Agents</a>
+        </div>
 
-<table class="modern-table">
-<thead>
-<tr>
-    <th>Agent Name</th>
-    <th>Total Amount</th>
-    <th>Total Due</th>
-    <th>No. of Invoices</th>
-</tr>
-</thead>
+        <!-- RIGHT: Date + Logout -->
+        <div class="navbar-right">
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">
+                    {{ username[0] if username else 'U' }}
+                </div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<tbody id="agentTable"></tbody>
-</table>
+    <div class="page-container">
 
-</div>
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Agent Name</th>
+                    <th>Total Amount</th>
+                    <th>Total Due</th>
+                    <th>No. of Invoices</th>
+                </tr>
+            </thead>
 
-<div id="agentPopup" class="popup hidden"></div>
+            <tbody id="agentTable"></tbody>
+        </table>
 
-<script src="/static/script.js"></script>
+    </div>
+
+    <div id="agentPopup" class="popup hidden"></div>
+
+    <script src="/static/script.js"></script>
 
 </body>
+
 </html>
