@@ -5,14 +5,23 @@
 let invoiceData = [];
 let customerCache = [];
 
+// ======================================================
+// INITIALIZATION
+// ======================================================
+
+document.addEventListener("DOMContentLoaded", () => {
+    const dateDisplay = document.getElementById("todayDateDisplay");
+    if (dateDisplay) {
+        const today = new Date();
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        dateDisplay.innerText = today.toLocaleDateString('en-IN', options);
+    }
+});
+
 
 // ======================================================
 // NAVIGATION
 // ======================================================
-
-function goToDashboard() {
-    window.location = "/dashboard";
-}
 
 function goToInvoices() {
     window.location = "/invoices-page";
@@ -35,13 +44,13 @@ async function login() {
 
     const res = await fetch("/login", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({username, password})
+        body: JSON.stringify({ username, password })
     });
 
     if (res.ok)
-        window.location = "/dashboard";
+        window.location = "/upload-page";
     else
         error.innerText = "Invalid Credentials";
 }
@@ -52,34 +61,8 @@ async function login() {
 // ======================================================
 
 async function logout() {
-    await fetch("/logout", {credentials: "include"});
+    await fetch("/logout", { credentials: "include" });
     window.location = "/";
-}
-
-
-// ======================================================
-// DASHBOARD
-// ======================================================
-
-async function loadDashboard() {
-
-    const res = await fetch("/dashboard-data", {
-        credentials: "include"
-    });
-
-    const data = await res.json();
-
-    document.getElementById("totalValue").innerText =
-        "₹ " + Number(data.totalValue).toLocaleString("en-IN");
-
-    document.getElementById("totalDue").innerText =
-        "₹ " + Number(data.totalDue).toLocaleString("en-IN");
-
-    document.getElementById("totalInvoices").innerText =
-        data.totalInvoices;
-
-    document.getElementById("uniqueCustomers").innerText =
-        data.uniqueCustomers;
 }
 
 
@@ -134,64 +117,119 @@ function parseDate(str) {
 // APPLY FILTERS  
 // ======================================================
 
-function applyFilters() {
+function applyDailyFilters() {
 
-    let data = [...invoiceData];
+    let filtered = [...invoiceData];
 
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-    const owner = document.getElementById("ownerFilter").value;
+    const cust = document.getElementById('custFilter').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value;
+    const ageing = document.getElementById('ageingFilter').value;
+    const owner = document.getElementById('ownerFilter').value;
 
-    const dateSort = document.getElementById("dateSort").value;
-    const financialSort = document.getElementById("financialSort").value;
-    const ageingSort = document.getElementById("ageingSort").value;
-    const order = document.getElementById("order").value;
+    const startDate = document.getElementById('startDateFilter').value;
+    const endDate = document.getElementById('endDateFilter').value;
 
+    const sortField = document.getElementById('sortField').value;
+    const dateSortField = document.getElementById('dateSortField').value;
+    const sortOrder = document.getElementById('sortOrder').value;
 
-    // ---------- FILTERS ----------
-
-    if (owner)
-        data = data.filter(i => i.owner === owner);
-
-    if (startDate) {
-        const sd = new Date(startDate);
-        data = data.filter(i => parseDate(i.start) >= sd);
+    // SEARCH FILTER
+    if (cust) {
+        filtered = filtered.filter(i =>
+            (i.customer || "").toLowerCase().includes(cust) ||
+            (i.invoice || "").toLowerCase().includes(cust) ||
+            (i.owner || "").toLowerCase().includes(cust)
+        );
     }
 
-    if (endDate) {
-        const ed = new Date(endDate);
-        data = data.filter(i => parseDate(i.end) <= ed);
+    // STATUS FILTER
+    if (status) {
+        filtered = filtered.filter(i => i.status === status);
     }
 
+    // OWNER FILTER
+    if (owner) {
+        filtered = filtered.filter(i => i.owner === owner);
+    }
 
-    // ---------- SORTING ----------
+    // AGEING FILTER
+    if (ageing) {
 
-    let sortField = null;
+        filtered = filtered.filter(i => {
 
-    if (dateSort) sortField = dateSort;
-    else if (financialSort) sortField = financialSort;
-    else if (ageingSort) sortField = ageingSort;
+            const age = Number(i.age) || 0;
 
-    if (sortField) {
+            if (ageing === "gt45") return age > 45;
+            if (ageing === "31_45") return age >= 31 && age <= 45;
+            if (ageing === "16_30") return age >= 16 && age <= 30;
+            if (ageing === "1_15") return age >= 1 && age <= 15;
+            if (ageing === "current") return age <= 0;
 
-        data.sort((a, b) => {
+            return true;
+        });
 
-            let A = a[sortField];
-            let B = b[sortField];
+    }
 
-            if (sortField === "start" || sortField === "end") {
-                A = parseDate(A);
-                B = parseDate(B);
-            } else {
-                A = Number(A);
-                B = Number(B);
+    // DATE FILTER
+    if (startDate || endDate) {
+
+        filtered = filtered.filter(i => {
+
+            const start = i.start ? new Date(i.start) : null;
+            const end = i.end ? new Date(i.end) : null;
+
+            if (startDate) {
+                const filterStart = new Date(startDate);
+                if (start && start < filterStart) return false;
             }
 
-            return order === "asc" ? A - B : B - A;
+            if (endDate) {
+                const filterEnd = new Date(endDate);
+                if (end && end > filterEnd) return false;
+            }
+
+            return true;
+
         });
+
     }
 
-    renderTable(data);
+    // SORTING
+    filtered.sort((a, b) => {
+
+        let valA;
+        let valB;
+
+        // DATE SORT
+        if (sortField === "date") {
+
+            valA = new Date(a[dateSortField] || "1900-01-01");
+            valB = new Date(b[dateSortField] || "1900-01-01");
+
+        }
+
+        // NUMBER SORT
+        else if (['amount', 'due', 'age'].includes(sortField)) {
+
+            valA = Number(a[sortField]) || 0;
+            valB = Number(b[sortField]) || 0;
+
+        }
+
+        // TEXT SORT
+        else {
+
+            valA = (a[sortField] || "").toString().toLowerCase();
+            valB = (b[sortField] || "").toString().toLowerCase();
+
+        }
+
+        if (sortOrder === "asc") return valA > valB ? 1 : -1;
+        else return valA < valB ? 1 : -1;
+
+    });
+
+    renderTable(filtered);
 }
 
 
@@ -218,6 +256,7 @@ function renderTable(data) {
         table.innerHTML += `
         <tr>
             <td>${i.invoice}</td>
+            <td>${i.type}</td>
             <td>${i.customer}</td>
             <td>₹ ${Number(i.amount).toLocaleString("en-IN")}</td>
             <td>₹ ${Number(i.due).toLocaleString("en-IN")}</td>
@@ -260,7 +299,7 @@ async function loadCustomersPage() {
 
 
 // ======================================================
-// POPUP
+// CUSTOMER POPUP
 // ======================================================
 
 function showPopup(event, name) {
@@ -286,20 +325,22 @@ function hidePopup() {
     document.getElementById("invoicePopup").classList.add("hidden");
 }
 
+
 // ================= AGENT PAGE NAVIGATION =================
 
-function goToAgentPage(){
+function goToAgentPage() {
     window.location = "/agent-page";
 }
+
 
 // ================= LOAD AGENT PAGE =================
 
 let agentCache = [];
 
-async function loadAgentPage(){
+async function loadAgentPage() {
 
     const res = await fetch("/agent-data", {
-        credentials:"include"
+        credentials: "include"
     });
 
     agentCache = await res.json();
@@ -324,7 +365,7 @@ async function loadAgentPage(){
 
 // ================= AGENT POPUP =================
 
-function showAgentPopup(event, name){
+function showAgentPopup(event, name) {
 
     const popup = document.getElementById("agentPopup");
 
@@ -334,7 +375,7 @@ function showAgentPopup(event, name){
     html += `<p><b>Total Amount:</b> ₹ ${agent.total_amount.toLocaleString("en-IN")}</p>`;
     html += `<p><b>Total Due:</b> ₹ ${agent.total_due.toLocaleString("en-IN")}</p><hr>`;
 
-    agent.invoices.forEach(inv=>{
+    agent.invoices.forEach(inv => {
         html += `<div>${inv.invoice} | ${inv.customer} | ₹${inv.due.toLocaleString("en-IN")}</div>`;
     });
 
@@ -344,6 +385,6 @@ function showAgentPopup(event, name){
     popup.classList.remove("hidden");
 }
 
-function hideAgentPopup(){
+function hideAgentPopup() {
     document.getElementById("agentPopup").classList.add("hidden");
 }

@@ -27,3 +27,24 @@ class Invoice(db.Model):
 
     owner = db.Column(db.String(100))
     status = db.Column(db.String(50))
+
+
+class DailyUpload(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ageing = db.Column(db.String(50))
+    date = db.Column(db.String(20))
+    transaction_no = db.Column(db.String(50))
+    type = db.Column(db.String(50))
+    status = db.Column(db.String(50))
+    customer_name = db.Column(db.String(200))
+    age = db.Column(db.Float)
+    amount = db.Column(db.Float)
+    balance_due = db.Column(db.Float)
+    owner = db.Column(db.String(100))
+    domain_name = db.Column(db.String(200))
+    payment_received_date = db.Column(db.String(20))
+    start_date = db.Column(db.String(20))
+    end_date = db.Column(db.String(20))
+    upload_timestamp = db.Column(db.String(50))
+    custom_status = db.Column(db.String(50), default="Pending")
+    comments = db.Column(db.Text, default="")

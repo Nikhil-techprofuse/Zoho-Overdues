@@ -1,7 +1,8 @@
 body {
-    font-family: Arial;
+    font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
-    background: #f4f6f9;
+    background: #f0f4f8;
+    color: #1a2740;
 }
 
 /* ================= LOGIN ================= */
@@ -42,25 +43,160 @@ button:hover {
 /* ================= NAVBAR ================= */
 
 .navbar {
-    background: #007bff;
+    background: linear-gradient(135deg, #0d47a1 0%, #1976d2 60%, #42a5f5 100%);
     color: white;
-    padding: 15px 30px;
+    padding: 0 30px;
+    height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 3px 12px rgba(13, 71, 161, 0.25);
+    position: sticky;
+    top: 0;
+    z-index: 200;
 }
 
-.logout-btn {
-    background: #1976d2;
-    border: none;
+/* Brand / Logo area */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-decoration: none;
     color: white;
-    padding: 8px 14px;
-    border-radius: 6px;
+}
+
+.navbar-brand .brand-icon {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Navigation links in the middle */
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.navbar-nav a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.navbar-nav a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.navbar-nav a.active {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    font-weight: 700;
+}
+
+/* Right info group */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.navbar-date {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* User Profile Dropdown */
+.profile-container {
+    position: relative;
     cursor: pointer;
 }
 
-.logout-btn:hover {
-    background: #125ea7;
+.profile-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #1976d2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 2px solid white;
+}
+
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    min-width: 180px;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+    color: #333;
+}
+
+.profile-container.open .profile-dropdown {
+    display: block;
+}
+
+.profile-info {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    background: #f8f9fa;
+}
+
+.profile-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 0 4px 0;
+    color: #1976d2;
+    text-transform: uppercase;
+}
+
+.profile-role {
+    font-size: 11px;
+    color: #666;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.profile-dropdown button.logout-btn-new {
+    width: 100%;
+    text-align: left;
+    background: white;
+    border: none;
+    padding: 12px 15px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #d32f2f;
+    transition: background 0.2s;
+}
+
+.profile-dropdown button.logout-btn-new:hover {
+    background: #ffebee;
 }
 
 /* ================= DASHBOARD ================= */
@@ -92,7 +228,7 @@ button:hover {
     padding: 25px;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -140,7 +276,8 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
     border: 1px solid #ccc;
     padding: 10px;
     text-align: center;
@@ -153,7 +290,7 @@ th, td {
     background: white;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .modern-table th {
@@ -182,7 +319,7 @@ th, td {
     background: white;
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     width: 280px;
     z-index: 999;
 }
@@ -209,4 +346,112 @@ th, td {
     text-align: center;
     padding: 15px;
     color: #888;
+}
+
+/* ================= TAGS ================= */
+
+.tag {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.tag-overdue {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.tag-sent {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.date-highlight {
+    background: #e3f2fd;
+    color: #0d47a1;
+    font-weight: bold;
+    border: 1px solid #bbdefb;
+    border-radius: 4px;
+    padding: 2px 5px;
+}
+
+/* ================= SCROLLABLE TABLE ================= */
+
+.table-container {
+    width: 100%;
+    max-height: 75vh;
+    overflow: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.modern-table {
+    width: 100%;
+    min-width: 1400px;
+    /* Force horizontal scroll */
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+}
+
+.modern-table th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #1976d2;
+    color: white;
+    white-space: nowrap;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid #0d47a1;
+    font-size: 13px;
+}
+
+.modern-table td {
+    white-space: nowrap;
+    padding: 8px 12px;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+.modern-table tr:hover td {
+    background: #f8fbff;
+}
+
+/* ====== CUSTOM STATUS ====== */
+.custom-status-select {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 11px;
+    background: white;
+    cursor: pointer;
+}
+
+.custom-status-select option[value="Paid"] {
+    color: #2e7d32;
+}
+
+.custom-status-select option[value="Not Paid"] {
+    color: #c62828;
+}
+
+.custom-status-select option[value="Pending"] {
+    color: #ed6c02;
+}
+
+.custom-status-select option[value="Not Updated"] {
+    color: #555;
+}
+
+.custom-status-select option[value="Others"] {
+    color: #1565c0;
 }
