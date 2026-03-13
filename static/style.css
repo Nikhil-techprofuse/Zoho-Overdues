@@ -25,6 +25,29 @@ body {
     width: 100%;
     margin: 10px 0;
     padding: 8px;
+    box-sizing: border-box;
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    padding-right: 40px; /* Space for the eye icon */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: transparent !important;
+    border: none;
+    color: #666 !important;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 button {
@@ -421,10 +444,55 @@ td {
     background: white;
     border-bottom: 1px solid #eee;
 }
-
 .modern-table tr:hover td {
     background: #f8fbff;
 }
+
+/* ====== HISTORY STYLES ====== */
+.history-list {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-right: 5px;
+}
+.history-item {
+    padding: 12px;
+    border-bottom: 1px solid #f9f9f9;
+    font-size: 13px;
+    transition: background 0.2s;
+    position: relative;
+}
+.history-item:hover { background: #f8f9fa; }
+.history-item:hover .btn-delete-history { display: flex; align-items: center; justify-content: center; }
+
+.history-item:last-child { border-bottom: none; }
+.history-item .file-name {
+    font-weight: bold;
+    color: #1976d2;
+    display: inline-block;
+    margin-bottom: 4px;
+    max-width: 85%;
+}
+
+.btn-delete-history {
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: #fff;
+    border: 1px solid #ffcdd2;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.btn-delete-history:hover { background: #d32f2f; color: white; }
+
+.history-item .meta { color: #666; font-size: 11px; margin-bottom: 6px; }
+.history-item .stats { font-size: 11px; color: #444; display: flex; gap: 8px; flex-wrap: wrap; }
+.stat-tag { padding: 2px 6px; border-radius: 4px; background: #f0f0f0; }
 
 /* ====== CUSTOM STATUS ====== */
 .custom-status-select {
@@ -435,23 +503,8 @@ td {
     background: white;
     cursor: pointer;
 }
-
-.custom-status-select option[value="Paid"] {
-    color: #2e7d32;
-}
-
-.custom-status-select option[value="Not Paid"] {
-    color: #c62828;
-}
-
-.custom-status-select option[value="Pending"] {
-    color: #ed6c02;
-}
-
-.custom-status-select option[value="Not Updated"] {
-    color: #555;
-}
-
-.custom-status-select option[value="Others"] {
-    color: #1565c0;
-}
+.custom-status-select option[value="Paid"] { color: #2e7d32; }
+.custom-status-select option[value="Not Paid"] { color: #c62828; }
+.custom-status-select option[value="Pending"] { color: #ed6c02; }
+.custom-status-select option[value="Not Updated"] { color: #555; }
+.custom-status-select option[value="Others"] { color: #1565c0; }

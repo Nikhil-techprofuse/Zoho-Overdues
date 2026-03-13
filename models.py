@@ -48,3 +48,13 @@ class DailyUpload(db.Model):
     upload_timestamp = db.Column(db.String(50))
     custom_status = db.Column(db.String(50), default="Pending")
     comments = db.Column(db.Text, default="")
+    change_flag = db.Column(db.String(20), default="unchanged")
+    is_active = db.Column(db.Boolean, default=True)
+
+
+class UploadHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255))
+    upload_date = db.Column(db.String(50))
+    stats = db.Column(db.Text)  # JSON-like string: "added: 1, updated: 2..."
+    user = db.Column(db.String(100))

@@ -15,10 +15,12 @@
             Zoho Overdues
         </a>
         <div class="navbar-nav">
-            <a href="/upload-page">Upload</a>
-            <a href="/dashboard" class="active">Dashboard</a>
+            <a href="/upload-page" class="active">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
             <a href="/customers-page">Customers</a>
+            {% if role == 'admin' %}
             <a href="/agent-page">Agents</a>
+            {% endif %}
         </div>
         <div class="navbar-right">
             <div class="profile-container" onclick="this.classList.toggle('open')">

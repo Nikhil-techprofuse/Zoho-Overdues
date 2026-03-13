@@ -17,10 +17,12 @@
 
         <!-- CENTER: Navigation -->
         <div class="navbar-nav">
-            <a href="/upload-page">Upload</a>
-            
+            <a href="/upload-page">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
             <a href="/customers-page">Customers</a>
+            {% if role == 'admin' %}
             <a href="/agent-page" class="active">Agents</a>
+            {% endif %}
         </div>
 
         <!-- RIGHT: Date + Logout -->
@@ -45,6 +47,7 @@
         <table class="modern-table">
             <thead>
                 <tr>
+                    <th style="width: 40px;">S.No</th>
                     <th>Agent Name</th>
                     <th>Total Amount</th>
                     <th>Total Due</th>

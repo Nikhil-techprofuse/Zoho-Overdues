@@ -17,10 +17,12 @@
 
         <!-- CENTER: Navigation -->
         <div class="navbar-nav">
-            <a href="/upload-page">Upload</a>
-            
+            <a href="/upload-page">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
             <a href="/customers-page" class="active">Customers</a>
+            {% if role == 'admin' %}
             <a href="/agent-page">Agents</a>
+            {% endif %}
         </div>
 
         <!-- RIGHT: Date + Logout -->
@@ -42,9 +44,19 @@
 
     <div class="page-container">
 
+        <div style="margin-bottom: 20px; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+            <label style="font-weight: bold; color: #666;">Sort by Due:</label>
+            <select id="dueSort" onchange="sortCustomers()" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; outline: none;">
+                <option value="none">Default</option>
+                <option value="high">High to Low</option>
+                <option value="low">Low to High</option>
+            </select>
+        </div>
+
         <table class="modern-table">
             <thead>
                 <tr>
+                    <th style="width: 40px;">S.No</th>
                     <th>Customer Name</th>
                     <th>Total Due</th>
                     <th>No. of Invoices</th>
