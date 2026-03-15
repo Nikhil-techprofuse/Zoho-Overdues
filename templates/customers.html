@@ -20,8 +20,11 @@
             <a href="/upload-page">Dashboard</a>
             <a href="/uploads-history-page">Recent History</a>
             <a href="/customers-page" class="active">Customers</a>
+            {% if role != 'admin' %}<a href="/my-tasks-page">My Tasks</a>{% endif %}
             {% if role == 'admin' %}
             <a href="/agent-page">Agents</a>
+            <a href="/create-task-page">Create Task</a>
+            <a href="/assigned-tasks">Assigned Tasks</a>
             {% endif %}
         </div>
 

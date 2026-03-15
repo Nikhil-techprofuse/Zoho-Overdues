@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-from models import db, User, Invoice, DailyUpload, UploadHistory
+from models import db, User, Invoice, DailyUpload, UploadHistory, Task, TaskInvoice
 import pandas as pd
 import datetime
 from datetime import datetime, date   
@@ -450,6 +450,13 @@ def upload_file():
 
         upload_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        # Global serial counter: always continues from the current DB maximum
+        # so no serial_no is ever reused across uploads.
+        from sqlalchemy import func as sa_func
+        _global_serial = db.session.query(sa_func.max(DailyUpload.serial_no)).scalar() or 0
+
+        _row_pos = 0   # row position counter — used only to backfill existing 0-serial records
+
         for idx, row in df.iterrows():
             # Support common variants for the Transaction/Invoice ID
             txn = str(
@@ -474,6 +481,7 @@ def upload_file():
             if not txn or str(txn).lower() == "nan":
                 continue
 
+            _row_pos += 1          # track row position (for backfilling existing 0-serial records)
             new_sheet_txns.add(txn)
 
             # Parse values from the sheet using normalized column names (with fallback aliases)
@@ -529,11 +537,17 @@ def upload_file():
                     rec.upload_timestamp = upload_time
                     rec.change_flag   = "updated"
                     rec.is_active     = True
+                    if not rec.serial_no:          # backfill only if unassigned
+                        _global_serial += 1        # give it the next global number
+                        rec.serial_no = _global_serial
                     stats["updated"] += 1
                 else:
                     # Mark unchanged but keep it visible
                     rec.change_flag = "unchanged"
                     rec.is_active   = True
+                    if not rec.serial_no:          # backfill only if unassigned
+                        _global_serial += 1        # give it the next global number
+                        rec.serial_no = _global_serial
                     stats["unchanged"] += 1
 
             else:
@@ -557,7 +571,8 @@ def upload_file():
                     custom_status    = "Pending",
                     comments         = "",
                     change_flag      = "new",
-                    is_active        = True
+                    is_active        = True,
+                    serial_no        = (_global_serial := _global_serial + 1)  # next global unique number
                 )
                 db.session.add(new_rec)
                 stats["added"] += 1
@@ -710,6 +725,7 @@ def uploaded_data():
     invoices = query.all()
     result = [{
         "id": i.id,
+        "serial_no": i.serial_no or 0,
         "ageing": i.ageing,
         "date": i.date,
         "invoice": i.transaction_no,
@@ -808,6 +824,329 @@ def download_data():
         as_attachment=True,
         download_name=filename
     )
+
+
+# =====================================================
+# CREATE TASK PAGE (ADMIN)
+# =====================================================
+
+@app.route("/create-task-page")
+def create_task_page():
+    if not require_login():
+        return render_template("index.html")
+    if session.get("role") != "admin":
+        return jsonify({"error": "Access denied. Admins only."}), 403
+    return render_template("create_task.html", username=session.get("user", "User"), role=session.get("role", "user"))
+
+
+@app.route("/owner-view-data")
+def owner_view_data():
+    if not require_login():
+        return jsonify({"error": "Unauthorized"}), 401
+    if session.get("role") != "admin":
+        return jsonify({"error": "Access denied. Admins only."}), 403
+
+    owner = request.args.get("owner", "").strip().lower()
+
+    query = DailyUpload.query.filter_by(is_active=True)
+    if owner:
+        query = query.filter(DailyUpload.owner == owner)
+
+    records = query.all()
+
+    result = [{
+        "id":            r.id,
+        "serial_no":     r.serial_no or 0,
+        "invoice":       r.transaction_no,
+        "date":          r.date,
+        "type":          r.type,
+        "customer":      r.customer_name,
+        "amount":        r.amount,
+        "due":           r.balance_due,
+        "age":           r.age,
+        "ageing":        r.ageing,
+        "status":        r.status,
+        "owner":         r.owner,
+        "start":         r.start_date,
+        "end":           r.end_date,
+        "custom_status": r.custom_status or "Pending",
+        "domain":        r.domain_name,
+    } for r in records]
+
+    return jsonify(result)
+
+
+@app.route("/owners-list")
+def owners_list():
+    """Return distinct owner names from active records (for dropdown)."""
+    if not require_login():
+        return jsonify({"error": "Unauthorized"}), 401
+    if session.get("role") != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    owners = db.session.query(DailyUpload.owner)\
+        .filter(DailyUpload.is_active == True)\
+        .filter(DailyUpload.owner != None)\
+        .filter(DailyUpload.owner != "")\
+        .distinct().all()
+
+    return jsonify(sorted([o[0] for o in owners if o[0]]))
+
+
+# =====================================================
+# TASK CREATION & ASSIGNMENT (ADMIN)
+# =====================================================
+
+@app.route("/create-task", methods=["POST"])
+def create_task():
+    if not require_login():
+        return jsonify({"error": "Unauthorized"}), 401
+    if session.get("role") != "admin":
+        return jsonify({"error": "Admins only"}), 403
+
+    data        = request.get_json()
+    owner       = (data.get("assigned_to") or "").strip().lower()
+    categories  = data.get("categories", [])   # list of strings e.g. ["overdue","before"]
+    invoices    = data.get("invoices", [])      # list of invoice dicts from frontend
+
+    if not owner or not categories or not invoices:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    task = Task(
+        assigned_to = owner,
+        created_by  = session.get("user", "admin"),
+        categories  = ",".join(categories),
+        created_at  = now,
+    )
+    db.session.add(task)
+    db.session.flush()   # get task.id before committing
+
+    for inv in invoices:
+        ti = TaskInvoice(
+            task_id       = task.id,
+            daily_id      = inv.get("id"),
+            invoice_no    = inv.get("invoice"),
+            customer_name = inv.get("customer"),
+            serial_no     = inv.get("serial_no") or 0,
+            balance_due   = inv.get("due") or 0,
+            category      = inv.get("category"),
+            follow_up     = "",
+            remark_status = "Pending",
+            updated_at    = "",
+        )
+        db.session.add(ti)
+
+    db.session.commit()
+    return jsonify({"success": True, "task_id": task.id,
+                    "invoice_count": len(invoices)}), 201
+
+
+@app.route("/tasks-list")
+def tasks_list():
+    """Admin: all tasks with their invoices and follow-up status."""
+    if not require_login():
+        return jsonify({"error": "Unauthorized"}), 401
+    if session.get("role") != "admin":
+        return jsonify({"error": "Admins only"}), 403
+
+    owner_filter = request.args.get("owner", "").strip().lower()
+    query = Task.query
+    if owner_filter:
+        query = query.filter_by(assigned_to=owner_filter)
+
+    tasks = query.order_by(Task.created_at.desc()).all()
+
+    result = []
+    for t in tasks:
+        inv_list = [{
+            "id":            ti.id,
+            "invoice_no":    ti.invoice_no,
+            "customer_name": ti.customer_name,
+            "serial_no":     ti.serial_no,
+            "balance_due":   ti.balance_due,
+            "category":      ti.category,
+            "follow_up":     ti.follow_up or "",
+            "remark_status": ti.remark_status or "Pending",
+            "updated_at":    ti.updated_at or "",
+        } for ti in t.invoices]
+
+        pending   = sum(1 for i in inv_list if i["remark_status"] == "Pending")
+        resolved  = sum(1 for i in inv_list if i["remark_status"] == "Resolved")
+
+        result.append({
+            "id":          t.id,
+            "assigned_to": t.assigned_to,
+            "created_by":  t.created_by,
+            "categories":  t.categories,
+            "created_at":  t.created_at,
+            "total":       len(inv_list),
+            "pending":     pending,
+            "resolved":    resolved,
+            "invoices":    inv_list,
+        })
+
+    return jsonify(result)
+
+
+# =====================================================
+# AGENT — MY TASKS
+# =====================================================
+
+@app.route("/my-tasks-page")
+def my_tasks_page():
+    if not require_login():
+        return redirect(url_for("home"))
+    return render_template("my_tasks.html",
+                           username=session.get("user", "User"),
+                           role=session.get("role", "owner"))
+
+
+@app.route("/my-tasks-data")
+def my_tasks_data():
+    """Agent: tasks assigned to the logged-in user, enriched with full DailyUpload row."""
+    if not require_login():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    username = session.get("user", "").lower()
+    tasks = Task.query.filter_by(assigned_to=username)\
+                      .order_by(Task.created_at.desc()).all()
+
+    result = []
+    for t in tasks:
+        inv_list = []
+        for ti in t.invoices:
+            # Pull full row from DailyUpload for all columns
+            du = DailyUpload.query.get(ti.daily_id) if ti.daily_id else None
+
+            inv_list.append({
+                "id":            ti.id,
+                "invoice_no":    ti.invoice_no,
+                "customer_name": ti.customer_name,
+                "serial_no":     ti.serial_no,
+                "balance_due":   ti.balance_due,
+                "category":      ti.category,
+                "follow_up":     ti.follow_up or "",
+                "remark_status": ti.remark_status or "Pending",
+                "updated_at":    ti.updated_at or "",
+                # Full DailyUpload columns (fallback to snapshot if record missing)
+                "ageing":        du.ageing        if du else "",
+                "date":          du.date          if du else "",
+                "type":          du.type          if du else "",
+                "status":        du.status        if du else "",
+                "age":           du.age           if du else "",
+                "amount":        du.amount        if du else 0,
+                "domain_name":   du.domain_name   if du else "",
+                "start_date":    du.start_date    if du else "",
+                "end_date":      du.end_date      if du else "",
+                "owner":         du.owner         if du else "",
+                "custom_status": du.custom_status if du else "",
+            })
+
+        result.append({
+            "id":          t.id,
+            "assigned_to": t.assigned_to,
+            "created_by":  t.created_by,
+            "categories":  t.categories,
+            "created_at":  t.created_at,
+            "invoices":    inv_list,
+        })
+
+    return jsonify(result)
+
+
+# =====================================================
+# ADMIN — ASSIGNED TASKS VIEW
+# =====================================================
+
+@app.route("/assigned-tasks")
+def assigned_tasks_page():
+    """Admin: render the Assigned Tasks overview page."""
+    if not require_login():
+        return redirect(url_for("home"))
+    if session.get("role") != "admin":
+        return redirect(url_for("home"))
+    return render_template("assigned_tasks.html",
+                           username=session.get("user", "Admin"),
+                           role=session.get("role", "admin"))
+
+
+@app.route("/assigned-tasks-data")
+def assigned_tasks_data():
+    """Admin: all tasks ever assigned, with full invoice data + agent remarks."""
+    if not require_login():
+        return jsonify({"error": "Unauthorized"}), 401
+    if session.get("role") != "admin":
+        return jsonify({"error": "Forbidden"}), 403
+
+    tasks = Task.query.order_by(Task.created_at.desc()).all()
+    result = []
+    for t in tasks:
+        inv_list = []
+        for ti in t.invoices:
+            du = DailyUpload.query.get(ti.daily_id) if ti.daily_id else None
+            inv_list.append({
+                "id":            ti.id,
+                "invoice_no":    ti.invoice_no,
+                "customer_name": ti.customer_name,
+                "serial_no":     ti.serial_no,
+                "balance_due":   ti.balance_due,
+                "category":      ti.category,
+                "follow_up":     ti.follow_up or "",
+                "remark_status": ti.remark_status or "Pending",
+                "updated_at":    ti.updated_at or "",
+                "ageing":      du.ageing      if du else "",
+                "date":        du.date        if du else "",
+                "type":        du.type        if du else "",
+                "status":      du.status      if du else "",
+                "age":         du.age         if du else "",
+                "amount":      du.amount      if du else 0,
+                "domain_name": du.domain_name if du else "",
+                "start_date":  du.start_date  if du else "",
+                "end_date":    du.end_date    if du else "",
+            })
+
+        result.append({
+            "id":          t.id,
+            "assigned_to": t.assigned_to,
+            "created_by":  t.created_by,
+            "categories":  t.categories,
+            "created_at":  t.created_at,
+            "invoices":    inv_list,
+        })
+
+    return jsonify(result)
+
+
+@app.route("/task-invoice/<int:ti_id>", methods=["PATCH", "DELETE"])
+def update_task_invoice(ti_id):
+    """Agent: update or delete a task invoice row."""
+    if not require_login():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    ti = TaskInvoice.query.get(ti_id)
+    if not ti:
+        return jsonify({"error": "Not found"}), 404
+
+    task = Task.query.get(ti.task_id)
+    if task.assigned_to != session.get("user", "").lower() and session.get("role") != "admin":
+        return jsonify({"error": "Access denied"}), 403
+
+    if request.method == "DELETE":
+        db.session.delete(ti)
+        db.session.commit()
+        return jsonify({"success": True})
+
+    data = request.get_json()
+    if "follow_up" in data:
+        ti.follow_up = data["follow_up"]
+    if "remark_status" in data:
+        ti.remark_status = data["remark_status"]
+    ti.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    db.session.commit()
+    return jsonify({"success": True})
 
 
 # =====================================================

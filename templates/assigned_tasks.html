@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assigned Tasks</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .at-page { width: 100%; margin: 0; padding: 20px 20px; box-sizing: border-box; }
+        .at-page h2 { font-size: 22px; color: #1a1a2e; margin-bottom: 20px; display:flex; align-items:center; gap:10px; }
+
+        /* ── Summary bar ── */
+        .summary-bar {
+            display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+        }
+        .sum-card {
+            background: #fff; border-radius: 12px; padding: 16px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07); border: 1px solid #eee;
+            min-width: 140px; text-align: center;
+        }
+        .sum-card .sum-val { font-size: 28px; font-weight: 800; color: #1a237e; }
+        .sum-card .sum-lbl { font-size: 12px; color: #888; margin-top: 2px; font-weight: 600; text-transform: uppercase; }
+
+        /* ── Filter bar ── */
+        .filter-bar {
+            display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+            background: #fff; border-radius: 12px; padding: 14px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07); border: 1px solid #eee;
+            margin-bottom: 22px;
+        }
+        .filter-bar select, .filter-bar input {
+            padding: 8px 12px; border: 1.5px solid #e0e0e0;
+            border-radius: 8px; font-size: 13px; font-weight: 500;
+            background: #fafbfc; cursor: pointer;
+        }
+        .filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: #1976d2; }
+        .filter-label { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; }
+
+        /* ── Task card ── */
+        .task-card {
+            background: #fff; border-radius: 14px;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.08);
+            border: 1px solid #e4e8f0; margin-bottom: 22px; overflow: hidden;
+        }
+        .task-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 22px;
+            background: linear-gradient(135deg, #283593, #1a237e);
+            color: #fff; cursor: pointer; user-select: none;
+        }
+        .task-header:hover { opacity: .94; }
+        .task-header-left { display: flex; flex-direction: column; gap: 4px; }
+        .task-title { font-size: 15px; font-weight: 700; }
+        .task-meta  { font-size: 11.5px; opacity: .75; }
+        .task-chevron { font-size: 18px; transition: transform .25s; }
+        .task-chevron.open { transform: rotate(180deg); }
+
+        .agent-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.18); border-radius: 20px;
+            padding: 4px 12px; font-size: 12px; font-weight: 700;
+            margin-right: 8px;
+        }
+
+        /* Stats row */
+        .task-stats {
+            display: flex; gap: 18px; padding: 9px 22px;
+            background: #f8f9fc; border-bottom: 1px solid #eee;
+            font-size: 13px; font-weight: 600; align-items: center; flex-wrap: wrap;
+        }
+        .sc-pend  { color: #e65100; }
+        .sc-done  { color: #2e7d32; }
+        .sc-othr  { color: #1565c0; }
+        .sc-prog  { margin-left: auto; }
+
+        /* Progress bar */
+        .prog-bar-wrap { width: 120px; background: #eee; border-radius: 6px; height: 7px; display: inline-block; vertical-align: middle; margin-left: 6px; }
+        .prog-bar-fill { height: 7px; border-radius: 6px; background: linear-gradient(90deg, #43a047, #66bb6a); transition: width .4s; }
+
+        /* Category pills */
+        .cpill { padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700; display:inline-block; }
+        .cpill.overdue { background:#fde8e8; color:#c62828; border:1px solid #f5c6cb; }
+        .cpill.before  { background:#e3f2fd; color:#1565c0; border:1px solid #bbdefb; }
+        .cpill.after   { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
+        .cpill.ageing  { background:#fff8e1; color:#e65100; border:1px solid #ffe082; }
+
+        /* ── Full width table ── */
+        .modern-table {
+            table-layout: fixed !important;
+            width: 100% !important;
+            font-size: 12px !important;
+        }
+        .modern-table th, .modern-table td {
+            padding: 8px 7px !important;
+            word-wrap: break-word;
+            white-space: normal !important;
+            vertical-align: top;
+        }
+        .col-idx   { width: 3%; }
+        .col-sno   { width: 4%; }
+        .col-inv   { width: 8%; }
+        .col-cust  { width: 10%; }
+        .col-date  { width: 6%; }
+        .col-type  { width: 5%; }
+        .col-age   { width: 4%; }
+        .col-due   { width: 7%; }
+        .col-cat   { width: 8%; }
+        .col-fup   { width: 5%; text-align:center; }
+        .col-rmk   { width: 20%; }
+
+        .rs-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; }
+        .rs-badge.Pending  { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; }
+        .rs-badge.Resolved { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; }
+        .rs-badge.Others   { background:#e3f2fd; color:#1565c0; border:1px solid #90caf9; }
+
+        .remark-preview {
+            font-size: 11.5px; color: #555; font-style: italic;
+            white-space: pre-wrap; word-wrap: break-word;
+        }
+        .no-remark { color: #ccc; font-style: italic; font-size: 11px; }
+
+        .empty-state { text-align: center; padding: 60px; color: #bbb; }
+        .empty-icon  { font-size: 50px; margin-bottom: 12px; }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="/upload-page">Zoho Overdues</a>
+        <div class="navbar-nav">
+            <a href="/upload-page">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
+            <a href="/customers-page">Customers</a>
+            {% if role != 'admin' %}<a href="/my-tasks-page">My Tasks</a>{% endif %}
+            {% if role == 'admin' %}
+            <a href="/agent-page">Agents</a>
+            <a href="/create-task-page">Create Task</a>
+            <a href="/assigned-tasks" class="active">Assigned Tasks</a>
+            {% endif %}
+        </div>
+        <div class="navbar-right">
+            <span class="navbar-date" id="todayDateDisplay"></span>
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">{{ username[0] if username else 'A' }}</div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="at-page">
+        <h2>📋 Assigned Tasks</h2>
+
+        <!-- Summary cards -->
+        <div class="summary-bar" id="summaryBar"></div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+            <span class="filter-label">Filter by</span>
+            <select id="filterAgent" onchange="applyFilters()">
+                <option value="">All Agents</option>
+            </select>
+            <select id="filterStatus" onchange="applyFilters()">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Others">Others</option>
+            </select>
+            <input type="text" id="filterSearch" placeholder="Search customer / invoice…" oninput="applyFilters()" style="min-width:220px;">
+        </div>
+
+        <!-- Task list -->
+        <div id="taskList">
+            <div class="empty-state"><div class="empty-icon">📭</div><p>Loading…</p></div>
+        </div>
+    </div>
+
+    <script>
+        const CAT_LABELS = { overdue:'🔴 Overdues', before:'📅 Before Start', after:'✅ After Start', ageing:'⏳ Ageing' };
+        let allTasks = [];
+
+        window.onload = () => {
+            const today = new Date();
+            document.getElementById('todayDateDisplay').innerText =
+                "Today: " + today.toLocaleDateString('en-IN', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+            loadTasks();
+        };
+
+        async function logout() {
+            await fetch("/logout", { credentials:"include" });
+            window.location = "/";
+        }
+
+        async function loadTasks() {
+            const res   = await fetch('/assigned-tasks-data', { credentials:'include' });
+            allTasks    = await res.json();
+            buildSummary(allTasks);
+            buildAgentFilter(allTasks);
+            renderTasks(allTasks);
+        }
+
+        function buildSummary(tasks) {
+            const totalTasks    = tasks.length;
+            const totalInvoices = tasks.reduce((s,t) => s + t.invoices.length, 0);
+            const totalResolved = tasks.reduce((s,t) => s + t.invoices.filter(i => i.remark_status === 'Resolved').length, 0);
+            const totalPending  = tasks.reduce((s,t) => s + t.invoices.filter(i => i.remark_status === 'Pending').length, 0);
+            const agents        = new Set(tasks.map(t => t.assigned_to)).size;
+
+            document.getElementById('summaryBar').innerHTML = `
+                <div class="sum-card"><div class="sum-val">${totalTasks}</div><div class="sum-lbl">Total Tasks</div></div>
+                <div class="sum-card"><div class="sum-val">${agents}</div><div class="sum-lbl">Agents</div></div>
+                <div class="sum-card"><div class="sum-val">${totalInvoices}</div><div class="sum-lbl">Total Invoices</div></div>
+                <div class="sum-card" style="border-top:3px solid #2e7d32;"><div class="sum-val" style="color:#2e7d32;">${totalResolved}</div><div class="sum-lbl">Resolved</div></div>
+                <div class="sum-card" style="border-top:3px solid #e65100;"><div class="sum-val" style="color:#e65100;">${totalPending}</div><div class="sum-lbl">Pending</div></div>`;
+        }
+
+        function buildAgentFilter(tasks) {
+            const agents = [...new Set(tasks.map(t => t.assigned_to))].sort();
+            const sel    = document.getElementById('filterAgent');
+            sel.innerHTML = '<option value="">All Agents</option>'
+                + agents.map(a => `<option value="${a}">${a}</option>`).join('');
+        }
+
+        function applyFilters() {
+            const agent  = document.getElementById('filterAgent').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+
+            const filtered = allTasks.filter(t => {
+                if (agent && t.assigned_to.toLowerCase() !== agent) return false;
+                const invMatch = t.invoices.some(i => {
+                    if (status && i.remark_status !== status) return false;
+                    if (search && !i.customer_name.toLowerCase().includes(search)
+                               && !i.invoice_no.toLowerCase().includes(search)) return false;
+                    return true;
+                });
+                if (search || status) return invMatch;
+                return true;
+            });
+            renderTasks(filtered);
+        }
+
+        function fmt(v)    { return v || '—'; }
+        function fmtAmt(v) { return v ? '₹ ' + Number(v).toLocaleString('en-IN') : '—'; }
+
+        function renderTasks(tasks) {
+            const el = document.getElementById('taskList');
+            if (!tasks.length) {
+                el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No tasks found.</p></div>`;
+                return;
+            }
+
+            el.innerHTML = tasks.map(t => {
+                const cats     = (t.categories || '').split(',').filter(Boolean);
+                const pills    = cats.map(c => `<span class="cpill ${c}">${CAT_LABELS[c]||c}</span>`).join(' ');
+                const total    = t.invoices.length;
+                const resolved = t.invoices.filter(i => i.remark_status === 'Resolved').length;
+                const pending  = t.invoices.filter(i => i.remark_status === 'Pending').length;
+                const others   = t.invoices.filter(i => i.remark_status === 'Others').length;
+                const pct      = total ? Math.round((resolved / total) * 100) : 0;
+
+                const agentInitial = (t.assigned_to || 'A')[0].toUpperCase();
+
+                const rows = t.invoices.map((inv, idx) => {
+                    const badge   = `<span class="rs-badge ${inv.remark_status || 'Pending'}">${inv.remark_status || 'Pending'}</span>`;
+                    const remarkHtml = inv.follow_up && inv.follow_up.trim()
+                        ? `<div class="remark-preview">${escHtml(inv.follow_up)}</div>`
+                        : `<span class="no-remark">No remarks yet</span>`;
+                    const updAt = inv.updated_at ? `<div style="font-size:10px;color:#aaa;margin-top:3px;">${inv.updated_at}</div>` : '';
+                    return `<tr>
+                        <td>${idx+1}</td>
+                        <td>${inv.serial_no || '—'}</td>
+                        <td>${inv.invoice_no}</td>
+                        <td><strong>${inv.customer_name}</strong></td>
+                        <td>${fmt(inv.date)}</td>
+                        <td>${fmt(inv.type)}</td>
+                        <td>${inv.age ? inv.age+'d' : '—'}</td>
+                        <td style="color:#c62828;font-weight:700;">${fmtAmt(inv.balance_due)}</td>
+                        <td><span class="cpill ${inv.category}">${CAT_LABELS[inv.category]||inv.category}</span></td>
+                        <td style="text-align:center;">${badge}</td>
+                        <td>${remarkHtml}${updAt}</td>
+                    </tr>`;
+                }).join('');
+
+                return `
+                <div class="task-card">
+                    <div class="task-header" onclick="toggleTask(${t.id})">
+                        <div class="task-header-left">
+                            <div class="task-title">
+                                <span class="agent-badge">👤 ${agentInitial}&nbsp;${t.assigned_to}</span>
+                                Task #${t.id}
+                            </div>
+                            <div class="task-meta">Assigned by ${t.created_by} &nbsp;·&nbsp; ${t.created_at} &nbsp;·&nbsp; ${total} invoice(s) &nbsp;&nbsp; ${pills}</div>
+                        </div>
+                        <span class="task-chevron" id="chev-${t.id}">▼</span>
+                    </div>
+                    <div class="task-stats">
+                        <span class="sc-done">✅ Resolved: ${resolved}</span>
+                        <span class="sc-pend">🕐 Pending: ${pending}</span>
+                        <span class="sc-othr">🔄 Others: ${others}</span>
+                        <span class="sc-prog">
+                            Progress: <strong>${pct}%</strong>
+                            <span class="prog-bar-wrap"><span class="prog-bar-fill" style="width:${pct}%"></span></span>
+                        </span>
+                    </div>
+                    <div id="tbody-${t.id}" style="display:none;">
+                        <table class="modern-table">
+                            <colgroup>
+                                <col class="col-idx"><col class="col-sno"><col class="col-inv">
+                                <col class="col-cust"><col class="col-date"><col class="col-type">
+                                <col class="col-age"><col class="col-due"><col class="col-cat">
+                                <col class="col-fup"><col class="col-rmk">
+                            </colgroup>
+                            <thead><tr>
+                                <th>#</th><th>S.No</th><th>Invoice</th>
+                                <th>Customer</th><th>Date</th><th>Type</th>
+                                <th>Age</th><th>Balance Due</th><th>Category</th>
+                                <th style="text-align:center;">Status</th><th>Agent Remarks</th>
+                            </tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleTask(id) {
+            const body = document.getElementById('tbody-'+id);
+            const chev = document.getElementById('chev-'+id);
+            const open = body.style.display !== 'none';
+            body.style.display = open ? 'none' : '';
+            chev.classList.toggle('open', !open);
+        }
+
+        function escHtml(s) {
+            return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+    </script>
+</body>
+</html>
