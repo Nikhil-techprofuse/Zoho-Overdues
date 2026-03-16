@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Create Task</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* ── PAGE LAYOUT ── */
+        .ct-page {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .ct-page h2 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ── FILTER BAR ── */
+        .ct-filters {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 22px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .ct-filters input[type="text"],
+        .ct-filters select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .ct-filters input[type="text"] {
+            min-width: 230px;
+        }
+
+        .ct-filters input[type="text"]:focus,
+        .ct-filters select:focus {
+            border-color: #1976d2;
+        }
+
+        .ct-filters select {
+            min-width: 190px;
+            cursor: pointer;
+        }
+
+        /* ── CREATE TASK BUTTON (highlighted) ── */
+        .btn-create-task {
+            background: linear-gradient(135deg, #e53935, #b71c1c);
+            color: white;
+            border: none;
+            padding: 11px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 3px 10px rgba(229, 57, 53, 0.35);
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-left: auto;
+        }
+
+        .btn-create-task:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 16px rgba(229, 57, 53, 0.45);
+        }
+
+        .btn-create-task:active {
+            transform: translateY(0);
+        }
+
+        /* ── SUMMARY STRIP ── */
+        .ct-summary {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .ct-summary-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #eee;
+            min-width: 160px;
+        }
+
+        .ct-summary-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .ct-summary-card span {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a2e;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .ct-summary-card.red span {
+            color: #d32f2f;
+        }
+
+        .ct-summary-card.blue span {
+            color: #1976d2;
+        }
+
+        /* ── CATEGORY CARDS ── */
+        .ct-cat-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ct-cat-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 13px 18px;
+            min-width: 185px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+            user-select: none;
+        }
+
+        .ct-cat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.11);
+        }
+
+        .ct-cat-card.active {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .ct-cat-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .ct-cat-title {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .ct-cat-sub {
+            margin: 2px 0 0;
+            font-size: 10px;
+            color: #888;
+        }
+
+        /* ── EMPTY STATE ── */
+        .ct-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+            font-size: 15px;
+        }
+
+        .ct-empty .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* ── CREATE TASK MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 14px;
+            padding: 32px;
+            width: 520px;
+            max-width: 95vw;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-box h3 {
+            margin: 0;
+            font-size: 17px;
+            color: #1976d2;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 12px;
+        }
+
+        .modal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .modal-field label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .modal-field input,
+        .modal-field select,
+        .modal-field textarea {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .modal-field input:focus,
+        .modal-field select:focus,
+        .modal-field textarea:focus {
+            border-color: #1976d2;
+        }
+
+        .modal-field textarea {
+            height: 90px;
+            resize: vertical;
+        }
+
+        .modal-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-row .modal-field {
+            flex: 1;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 4px;
+        }
+
+        .btn-modal-save {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 26px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .btn-modal-cancel {
+            background: #f0f0f0;
+            color: #555;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Priority colours in modal */
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .pri-high {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .pri-medium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .pri-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        /* ── TOAST ── */
+        #ctToast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 2000;
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(80px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="/upload-page">Zoho Overdues</a>
+        <div class="navbar-nav">
+            <a href="/upload-page">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
+            <a href="/customers-page">Customers</a>
+            {% if role == 'admin' %}
+            <a href="/agent-page">Agents</a>
+            <a href="/create-task-page" class="active">Create Task</a>
+            <a href="/assigned-tasks">Assigned Tasks</a>
+            {% endif %}
+        </div>
+        <div class="navbar-right">
+            <span class="navbar-date" id="todayDateDisplay"></span>
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">{{ username[0] if username else 'U' }}</div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="ct-page">
+
+        <h2>🗂️ Create Task — Owner View</h2>
+
+        <!-- FILTER BAR -->
+        <div class="ct-filters">
+            <input type="text" id="searchBox" placeholder="🔍 Search customer or invoice…" oninput="liveSearch()">
+
+            <select id="ownerSelect" onchange="loadOwnerData()">
+                <option value="">— Select Owner / Agent —</option>
+            </select>
+
+            <button class="btn-create-task" onclick="openTaskModal()" id="createTaskBtn" disabled>
+                ➕ Create Task
+            </button>
+        </div>
+
+        <!-- SUMMARY STRIP -->
+        <div class="ct-summary" id="summaryStrip" style="display:none;">
+            <div class="ct-summary-card blue">
+                <p>Total Invoices</p>
+                <span id="sumCount">0</span>
+            </div>
+            <div class="ct-summary-card red">
+                <p>Total Balance Due</p>
+                <span id="sumDue">₹ 0</span>
+            </div>
+            <div class="ct-summary-card">
+                <p>Total Amount</p>
+                <span id="sumAmount">₹ 0</span>
+            </div>
+        </div>
+
+        <!-- CATEGORY CARDS (visible once owner data is loaded) -->
+        <div class="ct-cat-row" id="catRow" style="display:none;">
+            <div class="ct-cat-card" id="ccat-overdue" onclick="ctCategoryFilter('overdue')"
+                style="border-left:4px solid #e53935;">
+                <span class="ct-cat-icon">🔴</span>
+                <div>
+                    <p class="ct-cat-title">Top 20 Overdues</p>
+                    <p class="ct-cat-sub">Highest balance due</p>
+                </div>
+            </div>
+            <div class="ct-cat-card" id="ccat-ageing" onclick="ctCategoryFilter('ageing')"
+                style="border-left:4px solid #fb8c00;">
+                <span class="ct-cat-icon">⏳</span>
+                <div>
+                    <p class="ct-cat-title">Top 10 Ageing</p>
+                    <p class="ct-cat-sub">Overdues &gt; 45 days old</p>
+                </div>
+            </div>
+            <div class="ct-cat-card" id="ccat-before" onclick="ctCategoryFilter('before')"
+                style="border-left:4px solid #1e88e5;">
+                <span class="ct-cat-icon">📅</span>
+                <div>
+                    <p class="ct-cat-title">10 Days Before Start</p>
+                    <p class="ct-cat-sub">Start date in next 10 days</p>
+                </div>
+            </div>
+            <div class="ct-cat-card" id="ccat-after" onclick="ctCategoryFilter('after')"
+                style="border-left:4px solid #43a047;">
+                <span class="ct-cat-icon">✅</span>
+                <div>
+                    <p class="ct-cat-title">10 Days After Start</p>
+                    <p class="ct-cat-sub">Started within last 10 days</p>
+                </div>
+            </div>
+            <div class="ct-cat-card" id="ccat-other" onclick="ctCategoryFilter('other')"
+                style="border-left:4px solid #7b1fa2;">
+                <span class="ct-cat-icon">📂</span>
+                <div>
+                    <p class="ct-cat-title">Leftover Invoices</p>
+                    <p class="ct-cat-sub">Remaining dues not in other categories</p>
+                </div>
+            </div>
+            <div class="ct-cat-card" id="ccat-clear" onclick="ctClearCategory()"
+                style="border-left:4px solid #9e9e9e; opacity:0.75;">
+                <span class="ct-cat-icon">↩</span>
+                <div>
+                    <p class="ct-cat-title">Show All</p>
+                    <p class="ct-cat-sub">Clear filter</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- OVERDUE SORT BAR (shows only when Top 20 Overdues is active) -->
+        <div id="overdueSortBar" style="display:none; align-items:center; gap:10px; margin-bottom:14px;">
+            <span style="font-size:13px; font-weight:600; color:#e53935;">🔴 Top 20 Overdues — Sort:</span>
+            <select id="overdueSortDir" onchange="resortOverdue()"
+                style="padding:7px 12px; border:1px solid #ddd; border-radius:8px; font-size:13px; cursor:pointer; outline:none;">
+                <option value="desc">⬇ High → Low</option>
+                <option value="asc">⬆ Low → High</option>
+            </select>
+        </div>
+
+
+        <div id="emptyState" class="ct-empty">
+            <span class="icon">👆</span>
+            Select an owner / agent above to view their assigned invoices.
+        </div>
+
+        <!-- INVOICE TABLE -->
+        <div id="tableWrap" class="table-container" style="display:none;">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">S.No</th>
+                        <th>Transaction</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Customer</th>
+                        <th style="min-width:110px;">Amount</th>
+                        <th style="min-width:120px;">Balance Due</th>
+                        <th>Age</th>
+                        <th>Ageing</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody id="ctTableBody"></tbody>
+            </table>
+        </div>
+
+    </div><!-- /ct-page -->
+
+
+    <!-- ASSIGN TASK MODAL -->
+    <div id="taskModal" class="modal-overlay" onclick="if(event.target===this) closeTaskModal()">
+        <div class="modal-box" style="max-width:440px;">
+            <h3>📋 Assign Task</h3>
+            <p style="color:#555; font-size:13px; margin:0 0 18px;">
+                Assigning to: <strong id="modalOwnerLabel" style="color:#1976d2;"></strong>
+            </p>
+
+            <p style="font-size:13px; font-weight:600; color:#333; margin-bottom:10px;">Select categories to include:
+            </p>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:22px;">
+                <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                    <input type="checkbox" id="chk-overdue" value="overdue"> 🔴 Top 20 Overdues
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                    <input type="checkbox" id="chk-ageing" value="ageing"> ⏳ Top 20 Ageing (age &gt; 45 days)
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                    <input type="checkbox" id="chk-before" value="before"> 📅 10 Days Before Start
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                    <input type="checkbox" id="chk-after" value="after"> ✅ 10 Days After Start
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                    <input type="checkbox" id="chk-other" value="other"> 📂 Leftover Invoices (remaining dues)
+                </label>
+            </div>
+
+            <p id="assignInfo" style="font-size:12px; color:#888; margin-bottom:14px;"></p>
+
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeTaskModal()">Cancel</button>
+                <button class="btn-modal-save" onclick="assignTask()" id="assignBtn">✓ Assign</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="ctToast"></div>
+
+    <script>
+        let ownerData = [];       // full dataset for selected owner
+        let filtered = [];       // after live search
+
+        window.onload = () => {
+            const today = new Date();
+            document.getElementById('todayDateDisplay').innerText =
+                "Today: " + today.toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+            loadOwners();
+        };
+
+        async function logout() {
+            await fetch("/logout", { credentials: "include" });
+            window.location = "/";
+        }
+
+        // ── Load owner dropdown ──
+        async function loadOwners() {
+            const res = await fetch('/owners-list', { credentials: 'include' });
+            const list = await res.json();
+            const sel = document.getElementById('ownerSelect');
+            list.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o;
+                opt.textContent = o.charAt(0).toUpperCase() + o.slice(1);
+                sel.appendChild(opt);
+            });
+        }
+
+        // ── Load invoices for selected owner ──
+        async function loadOwnerData() {
+            const owner = document.getElementById('ownerSelect').value;
+
+            // Reset
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('tableWrap').style.display = 'none';
+            document.getElementById('summaryStrip').style.display = 'none';
+            document.getElementById('createTaskBtn').disabled = true;
+            document.getElementById('searchBox').value = '';
+            ownerData = [];
+            filtered = [];
+
+            if (!owner) return;
+
+            const res = await fetch(`/owner-view-data?owner=${encodeURIComponent(owner)}`, { credentials: 'include' });
+            ownerData = await res.json();
+            filtered = [...ownerData];
+
+            precomputeCategories();   // build all 4 unique category sets at once
+
+            renderTable(filtered);
+            updateSummary(filtered);
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('tableWrap').style.display = '';
+            document.getElementById('summaryStrip').style.display = '';
+            document.getElementById('catRow').style.display = '';
+            document.getElementById('createTaskBtn').disabled = false;
+            ctClearCategory(); // reset any active category highlight
+        }
+
+        // ── Live search ──
+        function liveSearch() {
+            const q = document.getElementById('searchBox').value.toLowerCase();
+            filtered = ownerData.filter(i =>
+                (i.customer || '').toLowerCase().includes(q) ||
+                (i.invoice || '').toLowerCase().includes(q)
+            );
+            renderTable(filtered);
+            updateSummary(filtered);
+        }
+
+        // ── Summary ──
+        function updateSummary(data) {
+            const totalDue = data.reduce((s, i) => s + (Number(i.due) || 0), 0);
+            const totalAmount = data.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+            document.getElementById('sumCount').innerText = data.length;
+            document.getElementById('sumDue').innerText = '₹ ' + totalDue.toLocaleString('en-IN');
+            document.getElementById('sumAmount').innerText = '₹ ' + totalAmount.toLocaleString('en-IN');
+        }
+
+        // ── Render table ──
+        function formatDate(str) {
+            if (!str) return '—';
+            const d = new Date(str);
+            if (isNaN(d.getTime())) return str;
+            const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return `${d.getDate()}-${m[d.getMonth()]}-${d.getFullYear()}`;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('ctTableBody');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:30px;color:#aaa;">No invoices found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map((i, idx) => {
+                const statusTag = i.status === 'overdue'
+                    ? `<span class="tag tag-overdue">Overdue</span>`
+                    : `<span class="tag tag-sent">${i.status || 'Sent'}</span>`;
+
+                const agTag = `<span class="tag" style="background:#e3f2fd;color:#0d47a1;border:1px solid #bbdefb;min-width:80px;">${i.ageing || ''}</span>`;
+
+                return `<tr>
+                    <td style="color:#999;font-size:11px;">${i.serial_no || (idx + 1)}</td>
+                    <td style="font-weight:bold;">${i.invoice}</td>
+                    <td>${formatDate(i.date)}</td>
+                    <td>${i.type || ''}</td>
+                    <td>${i.customer}</td>
+                    <td>₹ ${Number(i.amount).toLocaleString('en-IN')}</td>
+                    <td style="font-weight:600;color:#d32f2f;">₹ ${Number(i.due).toLocaleString('en-IN')}</td>
+                    <td>${i.age}</td>
+                    <td>${agTag}</td>
+                    <td>${statusTag}</td>
+                    <td><span class="date-highlight">${formatDate(i.start)}</span></td>
+                    <td><span class="date-highlight" style="background:#fff3e0;color:#e65100;border-color:#ffe0b2;">${formatDate(i.end)}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── CATEGORY PRE-COMPUTATION (run once after owner data loads) ──────
+        //
+        // Each invoice belongs to AT MOST ONE category.
+        // Priority:  1. Top 20 Overdues
+        //            2. Top 20 Ageing  (placeholder)
+        //            3. 10 Days Before Start
+        //            4. 10 Days After Start
+        //
+        // The 'claimed' set grows as each category claims its invoices, so
+        // lower-priority categories skip invoices already claimed above.
+
+        let categoryData = { overdue: [], ageing: [], before: [], after: [] };
+
+        function precomputeCategories() {
+            const claimed = new Set();   // only the SELECTED invoices are claimed
+
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const todayStr = today.toISOString().split('T')[0];
+
+            // ── 1. Top 20 Overdues: sort → slice to 20 → THEN claim ──
+            categoryData.overdue = [...ownerData]
+                .filter(i => (Number(i.due) || 0) > 0)
+                .sort((a, b) => (Number(b.due) || 0) - (Number(a.due) || 0))
+                .slice(0, 20);        // ← slice FIRST (only top 20 are selected)
+            categoryData.overdue.forEach(i => claimed.add(i.invoice)); // claim only those 20
+
+            // ── 2. Top 10 Ageing: overdues only (due > 0) with age > 45 days ──
+            // Strictly excludes invoices already claimed by Top 20 Overdues above.
+            // Sorted: oldest age first, then highest balance due as tiebreaker.
+            categoryData.ageing = [...ownerData]
+                .filter(i => (Number(i.due) || 0) > 0)          // overdues only
+                .filter(i => (Number(i.age) || 0) > 45)         // age > 45 days
+                .filter(i => !claimed.has(i.invoice))            // not already in Top 20 Overdues
+                .sort((a, b) => {
+                    const ageDiff = (Number(b.age) || 0) - (Number(a.age) || 0);
+                    if (ageDiff !== 0) return ageDiff;
+                    return (Number(b.due) || 0) - (Number(a.due) || 0);
+                })
+                .slice(0, 10);
+            categoryData.ageing.forEach(i => claimed.add(i.invoice)); // claim so before/after skip them
+
+            // ── 3. 10 Days Before Start (start date: today → today+10) ──
+            const plus10 = new Date(today);
+            plus10.setDate(plus10.getDate() + 10);
+            const plus10Str = plus10.toISOString().split('T')[0];
+
+            categoryData.before = ownerData
+                .filter(i => {
+                    const s = (i.start || '').trim();
+                    return s && s >= todayStr && s <= plus10Str;
+                })
+                .filter(i => !claimed.has(i.invoice))   // exclude claimed only
+                .slice(0, 10);                           // slice FIRST
+            categoryData.before.forEach(i => claimed.add(i.invoice)); // then claim
+
+            // ── 4. 10 Days After Start (start date: today-10 → today) ──
+            const minus10 = new Date(today);
+            minus10.setDate(minus10.getDate() - 10);
+            const minus10Str = minus10.toISOString().split('T')[0];
+
+            categoryData.after = ownerData
+                .filter(i => {
+                    const s = (i.start || '').trim();
+                    return s && s >= minus10Str && s <= todayStr;
+                })
+                .filter(i => !claimed.has(i.invoice))   // exclude claimed only
+                .slice(0, 10);                           // slice FIRST
+            categoryData.after.forEach(i => claimed.add(i.invoice));  // then claim
+
+            // ── 5. Leftover Invoices: unclaimed with balance_due > 0 ──
+            categoryData.other = ownerData
+                .filter(i => !claimed.has(i.invoice))
+                .filter(i => (Number(i.due) || 0) > 0);  // only remaining dues
+        }
+
+
+        // ── Show a category's pre-computed data ──
+        function ctCategoryFilter(type) {
+            ['overdue', 'ageing', 'before', 'after', 'other', 'clear'].forEach(id => {
+                const el = document.getElementById('ccat-' + id);
+                if (el) el.classList.remove('active');
+            });
+            const activeEl = document.getElementById('ccat-' + type);
+            if (activeEl) activeEl.classList.add('active');
+
+            // Show / hide the overdue sort bar
+            const sortBar = document.getElementById('overdueSortBar');
+            sortBar.style.display = (type === 'overdue') ? 'flex' : 'none';
+            if (type === 'overdue') document.getElementById('overdueSortDir').value = 'desc';
+
+            if (type === 'ageing' && categoryData.ageing.length === 0) {
+                alert('No invoices with age > 45 days found for this agent.');
+                ctClearCategory();
+                return;
+            }
+
+            const result = categoryData[type] || [];
+            renderTable(result);
+            updateSummary(result);
+        }
+
+        // ── Re-sort the overdue list (within already-claimed invoices only) ──
+        function resortOverdue() {
+            const dir = document.getElementById('overdueSortDir').value;
+            const sorted = [...categoryData.overdue].sort((a, b) =>
+                dir === 'desc'
+                    ? (Number(b.due) || 0) - (Number(a.due) || 0)
+                    : (Number(a.due) || 0) - (Number(b.due) || 0)
+            );
+            renderTable(sorted);
+            updateSummary(sorted);
+        }
+
+        function ctClearCategory() {
+            ['overdue', 'ageing', 'before', 'after', 'other', 'clear'].forEach(id => {
+                const el = document.getElementById('ccat-' + id);
+                if (el) el.classList.remove('active');
+            });
+            document.getElementById('overdueSortBar').style.display = 'none';
+            renderTable(ownerData);
+            updateSummary(ownerData);
+        }
+
+
+        // ── Task modal ──
+        let _selectedRow = null;
+
+        function openTaskModal() {
+            const owner = document.getElementById('ownerSelect').value;
+            if (!owner) return;
+
+            // Pre-check whichever category is currently active
+            const activeCat = document.querySelector('.ct-cat-card.active')?.id?.replace('ccat-', '');
+            ['overdue', 'ageing', 'before', 'after', 'other'].forEach(c => {
+                const chk = document.getElementById('chk-' + c);
+                if (chk) chk.checked = (c === activeCat);
+            });
+
+            // Show count info
+            updateAssignInfo();
+            document.getElementById('modalOwnerLabel').innerText =
+                owner.charAt(0).toUpperCase() + owner.slice(1);
+            document.getElementById('taskModal').classList.add('open');
+        }
+
+        function updateAssignInfo() {
+            const selected = getSelectedCategoryInvoices();
+            document.getElementById('assignInfo').innerText =
+                selected.all.length > 0
+                    ? `${selected.all.length} invoice(s) from ${selected.cats.join(', ')} will be assigned.`
+                    : 'No invoices in selected categories.';
+        }
+
+        // Wire checkboxes to update info live
+        ['overdue', 'ageing', 'before', 'after', 'other'].forEach(c => {
+            const el = document.getElementById('chk-' + c);
+            if (el) el.addEventListener('change', updateAssignInfo);
+        });
+
+        function getSelectedCategoryInvoices() {
+            const cats = [];
+            const all = [];
+            const seen = new Set();  // deduplicate invoices that appear in multiple categories
+            ['overdue', 'ageing', 'before', 'after', 'other'].forEach(c => {
+                if (document.getElementById('chk-' + c)?.checked) {
+                    cats.push(c);
+                    (categoryData[c] || []).forEach(inv => {
+                        if (!seen.has(inv.invoice)) {
+                            seen.add(inv.invoice);
+                            all.push({ ...inv, category: c });
+                        }
+                    });
+                }
+            });
+            return { cats, all };
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.remove('open');
+        }
+
+        async function assignTask() {
+            const owner = document.getElementById('ownerSelect').value;
+            const { cats, all } = getSelectedCategoryInvoices();
+
+            if (!cats.length) {
+                alert('Please select at least one category.');
+                return;
+            }
+            if (!all.length) {
+                alert('No invoices found in the selected categories.');
+                return;
+            }
+
+            const btn = document.getElementById('assignBtn');
+            btn.disabled = true;
+            btn.innerText = 'Assigning…';
+
+            const payload = {
+                assigned_to: owner,
+                categories: cats,
+                invoices: all.map(inv => ({
+                    id: inv.id,
+                    invoice: inv.invoice,
+                    customer: inv.customer,
+                    serial_no: inv.serial_no,
+                    due: inv.due,
+                    category: inv.category,
+                })),
+            };
+
+            try {
+                const res = await fetch('/create-task', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeTaskModal();
+                    showToast(`✅ Task assigned to ${owner} — ${data.invoice_count} invoice(s)!`);
+                } else {
+                    alert(data.error || 'Failed to assign task');
+                }
+            } catch (err) {
+                alert('Network error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '✓ Assign';
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('ctToast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 4000);
+        }
+
+    </script>
+
+</body>
+
+</html>
