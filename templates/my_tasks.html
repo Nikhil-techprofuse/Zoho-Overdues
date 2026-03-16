@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Tasks</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .mt-page { width: 100%; margin: 0; padding: 20px 16px; box-sizing: border-box; }
+        .mt-page h2 { font-size: 22px; color: #1a1a2e; margin-bottom: 24px; display:flex; align-items:center; gap:10px; }
+
+        /* ── Task card ── */
+        .task-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.09);
+            border: 1px solid #e4e8f0;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+        .task-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: #fff; cursor: pointer; user-select: none;
+        }
+        .task-header:hover { opacity:.94; }
+        .task-meta { font-size: 12px; opacity:.75; margin-top:3px; }
+        .task-chevron { font-size:18px; transition:transform .25s; }
+        .task-chevron.open { transform:rotate(180deg); }
+
+        .cat-pills { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+        .cpill { padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700; }
+        .cpill.overdue { background:#fde8e8; color:#c62828; border:1px solid #f5c6cb; }
+        .cpill.before  { background:#e3f2fd; color:#1565c0; border:1px solid #bbdefb; }
+        .cpill.after   { background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9; }
+        .cpill.ageing  { background:#fff8e1; color:#e65100; border:1px solid #ffe082; }
+
+        .task-stats {
+            display: flex; gap: 20px; padding: 10px 24px;
+            background: #f8f9fc; border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        .stat-chip { font-weight:600; }
+        .stat-chip.pend  { color:#e65100; }
+        .stat-chip.done  { color:#2e7d32; }
+        .stat-chip.othr  { color:#1565c0; }
+
+        /* tick column */
+        .tick-done { color:#2e7d32; font-size:16px; }
+        .tick-none { color:#ddd; font-size:16px; }
+
+        /* click-row cursor */
+        .inv-row td { cursor: pointer; }
+        .inv-row td:last-child { cursor: default; }
+
+        /* Full-width fixed table - all cols visible, text wraps */
+        .modern-table {
+            table-layout: fixed !important;
+            width: 100% !important;
+            font-size: 12px !important;
+        }
+        .modern-table th, .modern-table td {
+            padding: 8px 6px !important;
+            word-wrap: break-word;
+            white-space: normal !important;
+            vertical-align: top;
+        }
+        /* Column widths as % */
+        .col-idx     { width: 3%; }
+        .col-sno     { width: 4%; }
+        .col-inv     { width: 8%; }
+        .col-cust    { width: 11%; }
+        .col-date    { width: 6%; }
+        .col-type    { width: 5%; }
+        .col-ageing  { width: 5%; }
+        .col-age     { width: 4%; }
+        .col-amount  { width: 7%; }
+        .col-due     { width: 7%; }
+        .col-status  { width: 6%; }
+        .col-domain  { width: 10%; }
+        .col-sdate   { width: 6%; }
+        .col-edate   { width: 6%; }
+        .col-cat     { width: 8%; }
+        .col-done    { width: 4%; text-align:center; }
+
+        /* ── Detail modal ── */
+        .detail-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.45); z-index: 2000;
+            justify-content: center; align-items: center;
+        }
+        .detail-overlay.open { display: flex; }
+        .detail-panel {
+            background: #fff; border-radius: 16px;
+            width: 700px; max-width: 96vw; max-height: 93vh;
+            overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+            padding: 32px 36px; position: relative;
+        }
+        .detail-close {
+            position: absolute; top: 16px; right: 20px;
+            background: none; border: none; font-size: 22px;
+            cursor: pointer; color: #aaa;
+        }
+        .detail-close:hover { color:#333; }
+        .detail-panel h3 { margin:0 0 4px; font-size:18px; color:#1a237e; }
+
+        .info-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px 20px; margin: 18px 0;
+        }
+        .info-item label { font-size:10px; font-weight:700; color:#999; text-transform:uppercase; display:block; margin-bottom:2px; }
+        .info-item span  { font-size:13px; color:#222; font-weight:600; }
+
+        .remarks-label { font-size:13px; font-weight:700; color:#333; margin-bottom:8px; }
+        .remarks-area {
+            width: 100%; min-height: 150px; padding: 14px;
+            font-size: 14px; border: 2px solid #e0e0e0;
+            border-radius: 10px; resize: vertical;
+            font-family: inherit; line-height: 1.6;
+            transition: border-color .2s; box-sizing: border-box;
+        }
+        .remarks-area:focus { outline:none; border-color:#1976d2; }
+
+        .status-sel {
+            padding: 9px 14px; border: 2px solid #e0e0e0;
+            border-radius: 9px; font-size: 13px; font-weight:600;
+            cursor: pointer; width: 100%; margin-bottom: 14px;
+        }
+        .modal-actions { display:flex; gap:12px; align-items:center; }
+        .btn-save-detail {
+            padding: 10px 28px;
+            background: linear-gradient(135deg,#1976d2,#1565c0);
+            color:#fff; border:none; border-radius:9px;
+            font-size:14px; font-weight:700; cursor:pointer;
+            transition:opacity .15s;
+        }
+        .btn-save-detail:hover { opacity:.88; }
+        .btn-save-detail:disabled { opacity:.5; cursor:default; }
+        .btn-undo {
+            padding: 10px 20px;
+            background: none; border: 2px solid #ef9a9a;
+            color: #c62828; border-radius:9px;
+            font-size:13px; font-weight:700; cursor:pointer;
+            transition: background .15s;
+        }
+        .btn-undo:hover { background:#fde8e8; }
+        .saved-ts { font-size:11px; color:#aaa; margin-top:8px; }
+
+        .empty-state { text-align:center; padding:70px 20px; color:#bbb; }
+        .empty-icon  { font-size:52px; margin-bottom:14px; }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="/upload-page">Zoho Overdues</a>
+        <div class="navbar-nav">
+            <a href="/upload-page">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
+            <a href="/customers-page">Customers</a>
+            {% if role != 'admin' %}<a href="/my-tasks-page" class="active">My Tasks</a>{% endif %}
+            {% if role == 'admin' %}
+            <a href="/agent-page">Agents</a>
+            <a href="/create-task-page">Create Task</a>
+            <a href="/assigned-tasks">Assigned Tasks</a>
+            {% endif %}
+        </div>
+        <div class="navbar-right">
+            <span class="navbar-date" id="todayDateDisplay"></span>
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">{{ username[0] if username else 'U' }}</div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mt-page">
+        <h2>📋 My Tasks</h2>
+        <div id="taskList">
+            <div class="empty-state"><div class="empty-icon">📭</div><p>Loading…</p></div>
+        </div>
+    </div>
+
+    <!-- ── Invoice Detail Modal ── -->
+    <div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this) closeDetail()">
+        <div class="detail-panel">
+            <button class="detail-close" onclick="closeDetail()">✕</button>
+            <h3 id="dCustomer">—</h3>
+            <p style="color:#888;font-size:13px;margin:2px 0 6px;" id="dInvLabel"></p>
+            <span id="dCatBadge" class="cpill"></span>
+
+            <div class="info-grid" style="margin-top:16px;">
+                <div class="info-item"><label>Serial No</label><span id="dSerial">—</span></div>
+                <div class="info-item"><label>Invoice No</label><span id="dInvNo">—</span></div>
+                <div class="info-item"><label>Type</label><span id="dType">—</span></div>
+                <div class="info-item"><label>Date</label><span id="dDate">—</span></div>
+                <div class="info-item"><label>Ageing</label><span id="dAgeing">—</span></div>
+                <div class="info-item"><label>Age (days)</label><span id="dAge">—</span></div>
+                <div class="info-item"><label>Amount</label><span id="dAmount">—</span></div>
+                <div class="info-item"><label>Balance Due</label><span id="dDue" style="color:#c62828;">—</span></div>
+                <div class="info-item"><label>Status</label><span id="dStatus2">—</span></div>
+                <div class="info-item"><label>Domain</label><span id="dDomain">—</span></div>
+                <div class="info-item"><label>Start Date</label><span id="dStart">—</span></div>
+                <div class="info-item"><label>End Date</label><span id="dEnd">—</span></div>
+                <div class="info-item"><label>Category</label><span id="dCat">—</span></div>
+                <div class="info-item"><label>Assigned By</label><span id="dBy">—</span></div>
+                <div class="info-item"><label>Task Created</label><span id="dCreated">—</span></div>
+            </div>
+
+            <hr style="border:none;border-top:1px solid #f0f0f0;margin:4px 0 16px;">
+            <p class="remarks-label">💬 Follow-up Remarks</p>
+            <textarea class="remarks-area" id="dRemarks" placeholder="Add your remarks, call notes, next steps…"></textarea>
+
+            <select class="status-sel" id="dStatusSel" style="margin-top:12px;">
+                <option value="Resolved">✅ Resolved</option>
+                <option value="Pending">🕐 Pending</option>
+                <option value="Others">🔄 Others</option>
+            </select>
+
+            <div class="modal-actions">
+                <button class="btn-save-detail" id="dSaveBtn" onclick="saveDetail()">Save</button>
+                <button class="btn-undo" onclick="undoDetail()">↩ Undo / Clear</button>
+                <span class="saved-ts" id="dSavedTs"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CAT_LABELS = { overdue:'🔴 Overdues', before:'📅 Before Start', after:'✅ After Start', ageing:'⏳ Ageing' };
+        let _activeInvId   = null;
+        let _origRemarks   = '';
+        let _origStatus    = 'Pending';
+
+        window.onload = () => {
+            const today = new Date();
+            document.getElementById('todayDateDisplay').innerText =
+                "Today: " + today.toLocaleDateString('en-IN',{ weekday:'short', year:'numeric', month:'short', day:'numeric' });
+            loadTasks();
+        };
+
+        async function logout() {
+            await fetch("/logout", { credentials:"include" });
+            window.location = "/";
+        }
+
+        async function loadTasks() {
+            const res   = await fetch('/my-tasks-data', { credentials:'include' });
+            const tasks = await res.json();
+            renderTasks(tasks);
+        }
+
+        function fmt(v)    { return v || '—'; }
+        function fmtAmt(v) { return v ? '₹ ' + Number(v).toLocaleString('en-IN') : '—'; }
+
+        function renderTasks(tasks) {
+            const el = document.getElementById('taskList');
+            if (!tasks.length) {
+                el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No tasks assigned to you yet.</p></div>`;
+                return;
+            }
+
+            el.innerHTML = tasks.map(t => {
+                const cats     = (t.categories||'').split(',').filter(Boolean);
+                const pills    = cats.map(c=>`<span class="cpill ${c}">${CAT_LABELS[c]||c}</span>`).join('');
+                const pending  = t.invoices.filter(i=>i.remark_status==='Pending').length;
+                const resolved = t.invoices.filter(i=>i.remark_status==='Resolved').length;
+                const others   = t.invoices.filter(i=>i.remark_status==='Others').length;
+
+                const rows = t.invoices.map((inv, idx) => {
+                    const statusText = inv.remark_status !== 'Pending'
+                        ? `<span class="tick-done" title="Remarks saved">✔</span>`
+                        : `<span class="tick-none" title="No remarks yet">○</span>`;
+                    return `<tr class="inv-row" id="row-${inv.id}" onclick='openDetail(${JSON.stringify(inv)},${JSON.stringify({created_by:t.created_by,created_at:t.created_at})})'>
+                        <td>${idx+1}</td>
+                        <td>${inv.serial_no||'—'}</td>
+                        <td>${inv.invoice_no}</td>
+                        <td><strong>${inv.customer_name}</strong></td>
+                        <td>${fmt(inv.date)}</td>
+                        <td>${fmt(inv.type)}</td>
+                        <td>${fmt(inv.ageing)}</td>
+                        <td>${inv.age ? inv.age+'d' : '—'}</td>
+                        <td>${fmtAmt(inv.amount)}</td>
+                        <td style="color:#c62828;font-weight:700;">${fmtAmt(inv.balance_due)}</td>
+                        <td>${fmt(inv.status)}</td>
+                        <td>${fmt(inv.domain_name)}</td>
+                        <td>${fmt(inv.start_date)}</td>
+                        <td>${fmt(inv.end_date)}</td>
+                        <td><span class="cpill ${inv.category}">${CAT_LABELS[inv.category]||inv.category}</span></td>
+                        <td style="text-align:center; white-space:nowrap;">${statusText}</td>
+                    </tr>`;
+                }).join('');
+
+                return `
+                <div class="task-card" id="tcard-${t.id}">
+                    <div class="task-header" onclick="toggleTask(${t.id})">
+                        <div>
+                            <div style="font-size:15px;font-weight:700;">Task #${t.id} &nbsp;·&nbsp; Assigned by ${t.created_by}</div>
+                            <div class="task-meta">Created: ${t.created_at} &nbsp;|&nbsp; ${t.invoices.length} invoice(s)</div>
+                            <div class="cat-pills">${pills}</div>
+                        </div>
+                        <span class="task-chevron" id="chev-${t.id}">▼</span>
+                    </div>
+                    <div class="task-stats">
+                        <span class="stat-chip done">✅ Resolved: ${resolved}</span>
+                        <span class="stat-chip pend">🕐 Pending: ${pending}</span>
+                        <span class="stat-chip othr">🔄 Others: ${others}</span>
+                    </div>
+                    <div id="tbody-${t.id}" style="display:none;">
+                        <div>
+                            <table class="modern-table">
+                                <colgroup>
+                                    <col class="col-idx"><col class="col-sno"><col class="col-inv">
+                                    <col class="col-cust"><col class="col-date"><col class="col-type">
+                                    <col class="col-ageing"><col class="col-age"><col class="col-amount">
+                                    <col class="col-due"><col class="col-status"><col class="col-domain">
+                                    <col class="col-sdate"><col class="col-edate"><col class="col-cat">
+                                    <col class="col-done">
+                                </colgroup>
+                                <thead><tr>
+                                    <th>#</th>
+                                    <th>S.No</th>
+                                    <th>Invoice</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Ageing</th>
+                                    <th>Age</th>
+                                    <th>Amount</th>
+                                    <th>Balance Due</th>
+                                    <th>Status</th>
+                                    <th>Domain</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Category</th>
+                                    <th style="text-align:center;">Done</th>
+                                </tr></thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleTask(id) {
+            const body = document.getElementById('tbody-'+id);
+            const chev = document.getElementById('chev-'+id);
+            const open = body.style.display !== 'none';
+            body.style.display = open ? 'none' : '';
+            chev.classList.toggle('open', !open);
+        }
+
+        // ── Detail modal ──
+        function openDetail(inv, task) {
+            _activeInvId = inv.id;
+            _origRemarks = inv.follow_up || '';
+            _origStatus  = inv.remark_status || 'Pending';
+
+            document.getElementById('dCustomer').innerText  = inv.customer_name;
+            document.getElementById('dInvLabel').innerText  = 'Invoice: ' + inv.invoice_no;
+            document.getElementById('dSerial').innerText    = inv.serial_no || '—';
+            document.getElementById('dInvNo').innerText     = inv.invoice_no;
+            document.getElementById('dType').innerText      = inv.type || '—';
+            document.getElementById('dDate').innerText      = inv.date || '—';
+            document.getElementById('dAgeing').innerText    = inv.ageing || '—';
+            document.getElementById('dAge').innerText       = inv.age ? inv.age+' days' : '—';
+            document.getElementById('dAmount').innerText    = inv.amount ? '₹ '+Number(inv.amount).toLocaleString('en-IN') : '—';
+            document.getElementById('dDue').innerText       = inv.balance_due ? '₹ '+Number(inv.balance_due).toLocaleString('en-IN') : '—';
+            document.getElementById('dStatus2').innerText   = inv.status || '—';
+            document.getElementById('dDomain').innerText    = inv.domain_name || '—';
+            document.getElementById('dStart').innerText     = inv.start_date || '—';
+            document.getElementById('dEnd').innerText       = inv.end_date || '—';
+            document.getElementById('dCat').innerText       = CAT_LABELS[inv.category] || inv.category || '—';
+            document.getElementById('dBy').innerText        = task.created_by;
+            document.getElementById('dCreated').innerText   = task.created_at;
+
+            const badge = document.getElementById('dCatBadge');
+            badge.className = 'cpill '+(inv.category||'');
+            badge.innerText = CAT_LABELS[inv.category] || inv.category || '';
+
+            document.getElementById('dRemarks').value   = _origRemarks;
+            document.getElementById('dStatusSel').value = _origStatus;
+            document.getElementById('dSavedTs').innerText = inv.updated_at ? 'Last saved: '+inv.updated_at : '';
+            document.getElementById('dSaveBtn').disabled  = false;
+            document.getElementById('dSaveBtn').innerText = 'Save';
+
+            document.getElementById('detailOverlay').classList.add('open');
+            setTimeout(()=>document.getElementById('dRemarks').focus(), 120);
+        }
+
+        function closeDetail() {
+            document.getElementById('detailOverlay').classList.remove('open');
+            _activeInvId = null;
+        }
+
+        // Clear remarks + reset status to Pending
+        function undoDetail() {
+            if (!confirm('Clear all remarks and reset status to Pending?')) return;
+            document.getElementById('dRemarks').value   = '';
+            document.getElementById('dStatusSel').value = 'Pending';
+        }
+
+        async function saveDetail() {
+            if (!_activeInvId) return;
+            const btn = document.getElementById('dSaveBtn');
+            btn.disabled = true; btn.innerText = 'Saving…';
+            const follow_up     = document.getElementById('dRemarks').value;
+            const remark_status = document.getElementById('dStatusSel').value;
+            try {
+                const res = await fetch(`/task-invoice/${_activeInvId}`, {
+                    method:'PATCH', credentials:'include',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ follow_up, remark_status }),
+                });
+                if (res.ok) {
+                    const now = new Date().toLocaleString('en-IN');
+                    document.getElementById('dSavedTs').innerText = 'Saved at '+now;
+                    btn.innerText = '✓ Saved';
+                    setTimeout(()=>{
+                        btn.innerText='Save';
+                        btn.disabled=false;
+                        closeDetail(); // Go back to the list
+                    }, 500);
+                    loadTasks();   // refresh table
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Failed');
+                    btn.disabled=false; btn.innerText='Save';
+                }
+            } catch(e) {
+                alert(e.message);
+                btn.disabled=false; btn.innerText='Save';
+            }
+        }
+    </script>
+</body>
+</html>

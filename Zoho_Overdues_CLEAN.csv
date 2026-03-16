@@ -1,0 +1,206 @@
+Ageing,DATE,Transaction#,Type,Status,Customer Name,Age,Amount,Balance Due,Owner,Domain name,Payment Received Date,Start Date,End Date
+>45 Days,2025-03-01,247049,invoice,overdue,Ebix Payment Services Pvt Ltd,363.0,233345.00,27968.00,Srilakshmi, usmans@ebixcash.com,,2/1/2025,1/1/2026
+>45 Days,2025-04-05,249315,invoice,overdue,SAI RAM ENTERPRISES,328.0,183556.00,24271.00,Srilakshmi,Google Ads,,1/10/2024,31/12/2024
+>45 Days,2025-05-02,250161,invoice,overdue,SAI RAM ENTERPRISES,301.0,235624.00,235624.00,Srilakshmi,Google Ads,,1/7/2024,30/09/2024
+>45 Days,2025-06-01,243533,invoice,overdue,YM GLOBAL TECHNOLOGIES PRIVATE LIMITED,271.0,145448.00,98532.00,Sireesha, ymgit.com,,1/8/2024,1/7/2025
+>45 Days,2025-06-14,TCH-INV-25-0006,invoice,overdue,"NETSTRIX Co., Ltd.",258.0,285954.30,4704.30,Srilakshmi,mipygn.com ,,5/1/2025,4/1/2026
+>45 Days,2025-07-10,251846,invoice,overdue,SAI RAM ENTERPRISES,232.0,164150.00,164150.00,Srilakshmi,Google Ads,,1/4/2024,30/06/2024
+>45 Days,2025-09-01,253777,invoice,overdue,AAR ONE INFOTECH PRIVATE LIMITED,179.0,5393.00,5393.00,Srilakshmi,aar-info.com,,1/9/2025,31/08/2026
+>45 Days,2025-09-08,253979,invoice,overdue,CMR TEXTILES & JEWELLERS PVT LTD,142.0,4143.00,1771.00,Sireesha,cmrmall.com,,10/10/2025,8/12/2026
+>45 Days,2025-10-10,254897,invoice,overdue,Careerpedia Edutech Pvt Ltd,137.0,7174.00,174,Vamsi,careerpedia.co,,7/10/2025,6/11/2025
+>45 Days,2025-10-10,255093,invoice,overdue,SAI RAM ENTERPRISES,140.0,83245.00,83245.00,Srilakshmi,Google Ads,,1/7/2025,31/07/2025
+>45 Days,2025-10-10,255247,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,140.0,1172094.00,1172094.00,Srilakshmi,ddo-email.com,,11/9/2025,10/9/2026
+>45 Days,2025-10-10,255248,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,140.0,1243083.00,1243083.00,Srilakshmi,ddo-email.net,,29/08/2025,28/08/2026
+>45 Days,2025-10-10,255250,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,140.0,387323.00,163400.00,Srilakshmi,dit-infra.in (direct-taxes.in),,6/9/2025,5/9/2026
+>45 Days,2025-10-12,254841,invoice,overdue,Deccan Charters Pvt Ltd,123.0,613600.00,52000.00,Sireesha,deccanexpress.in,,3/11/2025,2/11/2026
+>45 Days,2025-10-13,254944,invoice,overdue,MARKS MEDIA,112.0,10974.00,56,Sireesha,qosh.in,,6/11/2025,5/11/2026
+>45 Days,2025-10-17,255449,invoice,overdue,OKIE VENTURES PRIVATE LIMITED,131.0,732,732,Vamsi,xportbridge.com,,20/10/2025,19/11/2025
+>45 Days,2025-10-17,255463,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,133.0,2655.00,2655.00,Srilakshmi,devasa.in,,17/10/2025,16/10/2028
+>45 Days,2025-10-22,255483,invoice,overdue,GetMeHire Pvt Ltd,128.0,382,382,Vamsi,GetMeHire.in,,1/10/2025,31/10/2025
+>45 Days,2025-10-28,255675,invoice,overdue,All in 1 KPO solutions private limited,122.0,805,805,Vamsi,yourkpo.com,,1/10/2025,22/10/2025
+>45 Days,2025-10-31,255745,invoice,overdue,OKIE VENTURES PRIVATE LIMITED,119.0,230,230,Vamsi,Xporthub.com,,11-Feb-25,1/12/2025
+>45 Days,2025-11-08,255909,invoice,overdue,Zerodha Broking Limited,111.0,78591.54,11230.14,Srilakshmi,Brokerage Commission,,1/10/2025,31/10/2025
+>45 Days,2025-11-11,256160,invoice,overdue,Posiflex Technology (India) Pvt Ltd,108.0,72669.00,7856.00,Srilakshmi,aravind.s@posiflexindia.com,,16/10/2025,16/10/2025
+>45 Days,2025-11-20,256082,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,79.0,308712.00,308712.00,Srilakshmi,dg-ici.in (direct-taxes.in),,9/12/2025,8/12/2026
+>45 Days,2025-11-21,256619,invoice,overdue,SURENDRANATH COLLEGE,98.0,32450.00,32450.00,Vijay,urendranathcollege.ac.in,,21/11/2025,21/11/2025
+>45 Days,2025-11-26,256752,invoice,overdue,WHIZ SOFTWARE SOLUTION,93.0,512,512,Sireesha,nelsonhospitals.com,,30/10/2025,5/2/2026
+>45 Days,2025-12-15,257540,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,64.0,385412.00,385412.00,Srilakshmi,It-hyd.in(it-nwr.in),,28/12/2025,27/12/2026
+>45 Days,2025-12-15,257541,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,64.0,385412.00,385412.00,Srilakshmi,It-ngp.in (it-nwr.in ),,28/12/2025,27/12/2026
+>45 Days,2025-12-17,257604,invoice,overdue,KASADARA TECHNOLOGY SOLUTIONS PRIVATE LIMITED,72.0,1093695.00,314916.00,Sireesha,kasadara.com,,17/12/2025,16/12/2026
+>45 Days,2025-12-22,257736,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,67.0,460200.00,460200.00,Srilakshmi,it-wbs.in,,12/12/2025,11/12/2026
+>45 Days,2025-12-22,257737,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,67.0,184080.00,184080.00,Srilakshmi,it-aptg.in(it-dot.in ),,13/12/2025,12/12/2026
+>45 Days,2025-12-22,257738,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,67.0,2908.00,2908.00,Srilakshmi,shruti-info.com,,20/12/2025,2/9/2026
+>45 Days,2026-01-06,257868,invoice,overdue,Mactores Cognition Private Limited,52.0,8413.00,8413.00,Vamsi,mactores.in,,1/1/2026,31/01/2026
+>45 Days,2026-01-12,258200,invoice,overdue,AVENTUS INFORMATICS LLP,46.0,1829.00,1829.00,Vamsi,xcruit.com,,11/1/2026,10/2/2026
+>45 Days,2026-01-12,258312,invoice,overdue,7-Degree Advertising Solutions,46.0,732,732,Vamsi,livsustainable.solutions,,13/01/2026,12/2/2026
+>45 Days,2026-01-12,258379,invoice,overdue,Jigsow Advisors LLP,46.0,1082.00,164.74,Sireesha,jigsawinc.in,,9/1/2026,10/3/2026
+31 - 45 Days,2025-12-15,257505,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,44.0,385412.00,385412.00,Srilakshmi,it-raj.in (it-nwr.in),,15/01/2026,14/01/2027
+31 - 45 Days,2025-12-15,257519,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,43.0,384456.00,384456.00,Srilakshmi,dg-blr.in,,16/01/2026,15/01/2027
+31 - 45 Days,2025-12-15,257520,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,44.0,385412.00,385412.00,Srilakshmi,it-mum.in (it-nwr.in),,15/01/2026,14/01/2027
+31 - 45 Days,2026-01-12,258375,invoice,overdue,Trillion IT Services Pvt Ltd,41.0,175584.00,15584.00,Sireesha,babadrill.com,,7/1/2026,6/1/2027
+31 - 45 Days,2026-01-15,258443,invoice,overdue,Sharp It Pros,43.0,1151.00,1151.00,Vamsi,sharpitpros.com,,19/01/2026,18/02/2026
+31 - 45 Days,2026-01-19,258371,invoice,overdue,FINVIJ SYSTEMS PRIVATE LIMITED,39.0,9936.00,9936.00,Sireesha,AZURE,,1/12/2025,31/12/2025
+31 - 45 Days,2026-01-19,258522,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,39.0,34810.00,34810.00,Srilakshmi,diteb.in,,19/01/2026,18/01/2027
+31 - 45 Days,2026-01-20,258553,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,38.0,384385.00,384385.00,Srilakshmi,dg-rj.in (it-hrd.in),,13/01/2026,12/1/2027
+31 - 45 Days,2026-01-20,258554,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,38.0,384385.00,384385.00,Srilakshmi,it-kl.in (it-hrd.in),,13/01/2026,12/1/2027
+31 - 45 Days,2026-01-21,258576,invoice,overdue,ProIU Technologies Pvt Ltd.,37.0,449580.00,28774.00,Sireesha,Ideausher.com,,20/01/2026,19/01/2027
+31 - 45 Days,2026-01-22,258633,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,36.0,384385.00,384385.00,Srilakshmi,dg-kl.in (it-hrd.in),,22/01/2026,21/01/2027
+31 - 45 Days,2026-01-23,258669,invoice,overdue,Polo Queen Industrial And Fintech Limited,35.0,70897.00,2103.00,Sireesha,poloqueen.com,,24/01/2026,23/01/2027
+31 - 45 Days,2026-01-27,258739,invoice,overdue,Sofsales,31.0,765,765,Vamsi,sofsales.in,,30/01/2026,28/01/2026
+31 - 45 Days,2026-01-27,258782,invoice,overdue,BeyondTech IT Solutions,31.0,2183.00,2183.00,Sireesha,tadreeblms.com,,27/01/2026,26/01/2027
+16 - 30 Days,2026-01-22,258323,invoice,overdue,BeyondTech IT Solutions,18.0,85668.00,85668.00,Sireesha,smartcode.com.sa,,11/2/2026,10/2/2027
+16 - 30 Days,2026-02-01,259208,invoice,overdue,Mayo Institute of Medical Sciences,26.0,1964.00,1964.00,Vijay,mimsup.com,,18/06/2025,17/08/2025
+16 - 30 Days,2026-02-01,259209,invoice,overdue,Rising Webvibe Solutions,26.0,460,460,Sireesha,youngexplorer.net,,2/8/2025,14/08/2025
+16 - 30 Days,2026-02-01,259210,invoice,overdue,suman waste management (OPC) Pvt. Ltd.,26.0,562,562,Sireesha,sumangroups.in,,19/08/2025,1/9/2025
+16 - 30 Days,2026-02-01,259211,invoice,overdue,J.B. & Company,26.0,2428.00,2428.00,Sireesha,jbcompany.in,,1/10/2025,13/11/2025
+16 - 30 Days,2026-02-01,259347,invoice,overdue,EMBALLAGE INDIA PVT LTD,26.0,241,241,Shravya,emballageindia.com,,9/12/2025,20/12/2025
+16 - 30 Days,2026-02-01,259217,invoice,overdue,Srinidhi Financial Consultants,16.0,3823.00,3823.00,Shravya,srinidhifintech.com,,12/2/2026,11/2/2027
+16 - 30 Days,2026-02-01,259224,invoice,overdue,Pairbytes Software Pvt Ltd,18.0,7080.00,7080.00,Sireesha,clapcode.com,,10/2/2026,9/2/2027
+16 - 30 Days,2026-02-01,259308,invoice,overdue,SOCIOVOLVE ADVERTISE AND MARKETING,16.0,15122.00,15122.00,Sireesha,pincodeinfra.com,,14/02/2026,16/03/2027
+16 - 30 Days,2026-02-01,259313,invoice,overdue,Schach Engineers Private Limited,16.0,7316.00,7316.00,Shravya,antechoverseas.com,,15/02/2026,14/02/2027
+16 - 30 Days,2026-02-01,259339,invoice,overdue,RAYGUN GLOBAL METALS LLP,26.0,1609.00,1609.00,Shravya,raygunglobal.in,,19/01/2026,14/10/2026
+16 - 30 Days,2026-02-01,259346,invoice,overdue,Fem world,26.0,6206.00,3058.00,Sireesha,femworld.org,,28/12/2025,2/1/2027
+16 - 30 Days,2026-02-01,259362,invoice,overdue,AgroSonic Solutions Private Limited,26.0,3658.00,3658.00,Shravya,AgroSonic.in,,15/10/2025,14/10/2026
+16 - 30 Days,2026-02-01,259364,invoice,overdue,APPALACHIAN TECHNOLOGIES LLP,26.0,1333.00,1333.00,Vamsi,hirefullstacks.com,,1/2/2026,31/01/2026
+16 - 30 Days,2026-02-01,259368,invoice,overdue,DHARUN COMMUNICATION CONSULTANTS,26.0,5487.00,5487.00,Vamsi,dharuncommunications.in,,24/12/2025,23/03/2026
+16 - 30 Days,2026-02-01,259369,invoice,overdue,NTURM ENGINEERS LIMITED,26.0,5721.00,5721.00,Sireesha,nturm.com,,2/12/2025,20/12/2025
+16 - 30 Days,2026-02-01,259371,invoice,overdue,TRISHUL SANKALP SOLUTIONSPRIVATE LIMITED,26.0,1377.00,1377.00,Shravya,trishulsankalp.com,,8/7/2025,21/07/2025
+16 - 30 Days,2026-02-01,259373,invoice,overdue,PURNIMA INFOTECH,26.0,185006.00,155006.00,New deal - sumanth,sgpgims.org.in,,6/1/2026,6/1/2026
+16 - 30 Days,2026-02-01,259374,invoice,overdue,Impress Business Service and Solution,26.0,37760.00,18760.00,Sireesha,pvgindotech.com,,8/1/2026,7/1/2027
+16 - 30 Days,2026-02-01,259377,invoice,overdue,GREVION PRIVATE LIMITED,26.0,708,708,Shravya,grevion.in,,18/06/2025,17/06/2026
+16 - 30 Days,2026-02-01,259379,invoice,overdue,Variety Alloys And Steels LLP,26.0,944,944,Shravya,vasllp.com,,6/5/2025,5/5/2026
+16 - 30 Days,2026-02-01,259382,invoice,overdue,Sharp It Pros,26.0,920,920,Vamsi,sharpitpros.com,,26/12/2025,18/01/2026
+16 - 30 Days,2026-02-01,259383,invoice,overdue,Harshita IT Services OPC Pvt Ltd,26.0,590,590,Vamsi,mlnclinicalsolutions.com,,16/07/2025,16/07/2025
+16 - 30 Days,2026-02-01,259384,invoice,overdue,ASPRIDETECH SOLUTIONS PVT LTD,26.0,1558.00,1558.00,Vamsi,mypridegames.com,,26/10/2025,14/11/2025
+16 - 30 Days,2026-02-01,259398,invoice,overdue,Om Structures Solution,26.0,6584.00,6584.00,Vamsi,omstructuressolution.com,,1/2/2026,30/04/2026
+16 - 30 Days,2026-02-01,259399,invoice,overdue,Laddhad College of Pharmacy,26.0,14510.00,14510.00,Shravya,lcpbuldana.ac.in,,28/06/2025,30/01/2026
+16 - 30 Days,2026-02-02,258988,invoice,overdue,COMPUTER MEGA MART INC,25.0,3883.00,3883.00,Shravya,computermegamart.com,,15/12/2025,1/2/2027
+16 - 30 Days,2026-02-04,258929,invoice,overdue,KAAWISH ERUDITE PRIVATE LIMITED,23.0,138993.00,138993.00,Vamsi,iwish.academy,,4/2/2026,3/3/2026
+16 - 30 Days,2026-02-04,258949,invoice,overdue,MASTI HEALTH AND BEAUTY PRIVATE LIMITED,23.0,32612.00,32612.00,Vamsi,o2spa.org,,1/2/2026,28/02/2026
+16 - 30 Days,2026-02-04,258950,invoice,overdue,Ridhira Living Private Limited,23.0,35247.00,35247.00,Vamsi,o2spa.org,,1/2/2026,28/02/2026
+16 - 30 Days,2026-02-05,259096,invoice,overdue,signitives technologies,22.0,2714.00,2714.00,Sireesha,Cnoopy.com,,5/2/2026,25/10/2026
+16 - 30 Days,2026-02-06,259125,invoice,overdue,ISPAN SERVICES PRIVATE LIMITED,21.0,1339.00,1339.00,Sireesha,"shubhacounselling.com
+(ispan.in)",,3/11/2025,1/4/2026
+16 - 30 Days,2026-02-06,259129,invoice,overdue,SHORTFORM DIGITAL MEDIALABS PRIVATE LIMITED,21.0,69502.00,16815.00,Sireesha,theshortmedia.com,,6/2/2026,5/2/2027
+16 - 30 Days,2026-02-07,259135,invoice,overdue,Prolitus Technologies Pvt. Ltd.,18.0,4390.00,74,Vamsi,Prolitus.com,,10/2/2026,9/3/2026
+16 - 30 Days,2026-02-07,259156,invoice,overdue,MAHA SAI ALUMINIUM PROFILES PVT. LTD.,20.0,332,332,Sireesha,mahasaialuminium.com,,7/2/2026,28/03/2026
+16 - 30 Days,2026-02-09,259197,invoice,overdue,ALINE DIGITAL,18.0,3233.00,3233.00,Sireesha,Alinedigital.in,,5/2/2026,10/2/2027
+16 - 30 Days,2026-02-10,259072,invoice,overdue,Cloud Dreams,17.0,18981.00,18981.00,Sireesha,magentagroup.in,,9/2/2026,8/2/2026
+16 - 30 Days,2026-02-10,259352,invoice,overdue,Trade2Online Pvt. Ltd,17.0,13473.00,13473.00,Vamsi,chrinfra.com,,31/08/2025,28/02/2026
+16 - 30 Days,2026-02-10,259348,invoice,overdue,MSR Hospitality Services Pvt. Ltd.,17.0,1151.00,1151.00,Shravya,rameestrandinn.com,,20/06/2025,11/7/2025
+16 - 30 Days,2026-02-10,259354,invoice,overdue,marify digital,17.0,22396.00,22396.00,New deal - sumanth,almaadeedlaw.com,,10/2/2026,9/2/2027
+16 - 30 Days,2026-02-11,259411,invoice,overdue,Sysin Technologies LLP,16.0,2626.00,2626.00,Sireesha,sysin.in,,11/2/2026,17/11/2026
+1 - 15 Days,2026-02-01,259223,invoice,overdue,Krishna Tej,6.0,1652.00,1652.00,Sireesha,sidgs-inc.com,,24/02/2026,23/02/2027
+1 - 15 Days,2026-02-01,259232,invoice,overdue,Balaji Raviram,6.0,11470.00,11470.00,Shravya,ics-certs.com ,,23/02/2026,22/02/2027
+1 - 15 Days,2026-02-01,259235,invoice,overdue,Frizzon Services Private Limited,1.0,8281.00,8281.00,Sireesha,frizzon.co ,,1/3/2026,21/03/2027
+1 - 15 Days,2026-02-01,259236,invoice,overdue,INR GLOBAL IMPORTS AND EXPORTS PRIVATE LIMITED,1.0,4779.00,4779.00,Shravya,inrglobal.in,,28/02/2026,27/02/2027
+1 - 15 Days,2026-02-01,259237,invoice,overdue,KANPEKI WORKFORCE PRIVATE LIMITED,1.0,2294.00,2294.00,Sireesha,kanpekiworkforce.com,,28/02/2026,27/02/2027
+1 - 15 Days,2026-02-01,259239,invoice,overdue,ERUDITE ASSET ADVISORY SERVICES LL,1.0,32922.00,32922.00,Sireesha,veritasol.com,,28/02/2026,27/02/2027
+1 - 15 Days,2026-02-01,259240,invoice,overdue,Aditi Prasad Tandale,1.0,4928.00,4928.00,Shravya,shubhamkaroti.in,,28/02/2026,16/03/2027
+1 - 15 Days,2026-02-01,259242,invoice,overdue,HOOTERBUX VENTURE (OPC) PRIVATE LIMITED,1.0,3968.00,3968.00,Shravya,spanwings.in,,27/02/2026,16/03/2027
+1 - 15 Days,2026-02-01,259245,invoice,overdue,Prema- Terraflex Advisors (OPC) Private Limited,1.0,4130.00,4130.00,Sireesha,terraflexadvisors.com,,27/02/2026,26/02/2027
+1 - 15 Days,2026-02-01,259246,invoice,overdue,Negen Diagnostics Pvt. Ltd.,1.0,157506.00,2670.00,Sireesha,negendiagnostics.com,,27/02/2026,30/03/2027
+1 - 15 Days,2026-02-01,259247,invoice,overdue,Green Web Technologies,1.0,21948.00,21948.00,Sireesha,greenwebtechnologies.co,,27/02/2026,26/02/2027
+1 - 15 Days,2026-02-01,259250,invoice,overdue,Ms.Nandita Singh,1.0,1652.00,1652.00,Sireesha,gifthappybubbles.com,,27/02/2026,26/02/2027
+1 - 15 Days,2026-02-01,259253,invoice,overdue,phenomenaltechnologies,1.0,9801.00,9801.00,Shravya,phenomenaltechnologies.com ,,27/02/2026,26/02/2027
+1 - 15 Days,2026-02-01,259255,invoice,overdue,Decent Apparels,1.0,3823.00,3823.00,Shravya,Cushybee.com,,27/02/2026,26/02/2027
+1 - 15 Days,2026-02-01,259260,invoice,overdue,Manmohan Aggarwal,1.0,3823.00,3823.00,Shravya,actaglobe.com,,27/02/2026,26/02/2027
+1 - 15 Days,2026-02-01,259264,invoice,overdue,BeyondTech IT Solutions,6.0,8351.00,8351.00,Sireesha,alrifainc.com,,24/02/2026,22/12/2026
+1 - 15 Days,2026-02-01,259268,invoice,overdue,MP Warehousing and Logistics Corporation,6.0,55403.00,4696.00,Shravya,mpwlc.co.in,,25/02/2026,18/04/2027
+1 - 15 Days,2026-02-01,259271,invoice,overdue,BeyondTech IT Solutions,6.0,137763.00,137763.00,Sireesha,tarqeem.sa ,,24/02/2026,14/03/2027
+1 - 15 Days,2026-02-01,259276,invoice,overdue,AWConstrucion PVT LTD,6.0,8180.00,8180.00,Shravya,awcgroup.in,,24/02/2026,28/03/2026
+1 - 15 Days,2026-02-01,259287,invoice,overdue,Sayyeda Fathema,7.0,7561.00,7561.00,Sireesha,meshcare.com.au,,21/02/2026,8/2/2026
+1 - 15 Days,2026-02-01,259294,invoice,overdue,SRI SAI TECHNOLOGIES,11.0,15293.00,15293.00,Shravya,srisaitechnologies.co.in,,20/02/2026,19/02/2027
+1 - 15 Days,2026-02-01,259334,invoice,overdue,Harika,3.0,7316.00,7316.00,Sireesha,infraopsxpert.com,,25/02/2026,24/02/2027
+1 - 15 Days,2026-02-01,259365,invoice,overdue,VEERADHYA ENGINEERING LLP,11.0,10974.00,10974.00,Sireesha,veeradhyaengg.com,,17/02/2026,16/08/2026
+1 - 15 Days,2026-02-04,259055,invoice,overdue,Fonobees Techno Solutions,3.0,7316.00,180,Sireesha,aexea.co.in(gsuite.aexea.net),,26/02/2025,25/02/2026
+1 - 15 Days,2026-02-06,259086,invoice,overdue,SP TECH STAFFING SOLUTIONS,13.0,2464.00,2464.00,Sireesha,sptecinc.com,,15/02/2026,14/05/2026
+1 - 15 Days,2026-02-10,259331,invoice,overdue,Naval Sachdev,12.0,1912.00,1912.00,Sireesha,surabhitravelsonline.com,,20/02/2026,19/03/2026
+1 - 15 Days,2026-02-12,259438,invoice,overdue,BIOMATIQ PRIVATE LIMITED,15.0,708,708,Sireesha,biomatiq.com,,6/2/2026,6/2/2026
+1 - 15 Days,2026-02-13,259468,invoice,overdue,Us consulate general,14.0,9218.00,9218.00,Srilakshmi,Tata Sky,,11/12/2025,10/3/2026
+1 - 15 Days,2026-02-13,259475,invoice,overdue,M/S. SHREE SAITECH SOLUTION,14.0,212,212,Sireesha,shreesaitechsolution.com,,10/2/2026,13/02/2026
+1 - 15 Days,2026-02-17,259585,invoice,overdue,Microsoft Corporation (India) Pvt. Ltd.,10.0,53546.09,53546.09,Srilakshmi,Microsoft Corporation (India) Pvt. Ltd.,,15/01/2026,14/02/2026
+1 - 15 Days,2026-02-17,259583,invoice,overdue,Make The Change GmbH,10.0,2445.00,2445.00,,Makethechange.education,,17/02/2026,15/06/2026
+1 - 15 Days,2026-02-18,259612,invoice,overdue,Sysin Technologies LLP,9.0,11676.00,11676.00,Sireesha,nordicglobal.net,,18/02/2026,8/10/2026
+1 - 15 Days,2026-02-19,259367,invoice,overdue,BHARAT VOIP COMMUNICATIONS PRIVATE LIMITED,8.0,8496.00,8496.00,Sireesha,bharatvoip.com and bharatfiber.net,,20/01/2026,19/04/2026
+1 - 15 Days,2026-02-19,259407,invoice,overdue,Mindworks Solutions Pvt. Ltd.,8.0,3658.00,3658.00,Srilakshmi,patindia.com,,8/2/2026,7/2/2027
+1 - 15 Days,2026-02-19,259637,invoice,overdue,NEPHROCARE HEALTH SERVICES LIMITED,8.0,112325.00,112325.00,,GUPSHUP INC SAN FRANCISCO CA,,17/02/2026,17/02/2026
+1 - 15 Days,2026-02-20,259417,invoice,overdue,Bhashyam Educational Society,7.0,133390.00,133390.00,Sireesha,AZURE,,1/1/2026,31/01/2026
+1 - 15 Days,2026-02-20,259420,invoice,overdue,MULTIVERSE EXIM PRIVATE LIMITED,7.0,14047.00,14047.00,Vamsi,mvexim.in,,28/02/2026,27/03/2026
+1 - 15 Days,2026-02-20,259425,invoice,overdue,FINVIJ SYSTEMS PRIVATE LIMITED,7.0,9970.00,9970.00,Sireesha,AZURE,,1/1/2026,31/01/2026
+1 - 15 Days,2026-02-20,259529,invoice,overdue,Manthan Partners,4.0,1097.00,1097.00,Vamsi,manthanpartners.co.in,,25/02/2026,24/03/2026
+1 - 15 Days,2026-02-20,259568,invoice,overdue,SAMRIDH KNOWLEDGE PRIVATE LIMITED,7.0,4720.00,4720.00,Srilakshmi,Bing Account Maintenance Fee,,21/02/2026,20/03/2026
+1 - 15 Days,2026-02-20,259662,invoice,overdue,WARMFUNELO LLP,7.0,36000.00,16000.00,,warmfunelo.com,,20/02/2026,19/02/2027
+1 - 15 Days,2026-02-20,259666,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,7.0,384385.00,384385.00,Srilakshmi,dg-br.in,,20/02/2026,19/02/2027
+1 - 15 Days,2026-02-20,259668,invoice,overdue,METALOGIC DIGITAL PRIVATE LIMITED,7.0,436,436,Sireesha,metalogicdigital.in,,23/01/2026,18/02/2026
+1 - 15 Days,2026-02-21,259688,invoice,overdue,Saeed Shaik,6.0,14978.00,2233.00,,sidehustlewin.com,,7/2/2026,17/02/2027
+1 - 15 Days,2026-02-22,259387,invoice,overdue,HOUSENEED DOORSTEP SERVICES PRIVATE LIMITED,5.0,78517.00,78517.00,Vamsi,vehiclecare.in,,22/02/2026,25/05/2026
+1 - 15 Days,2026-02-23,259729,invoice,overdue,Mindworks Solutions Pvt. Ltd.,4.0,3407.46,3407.46,Srilakshmi,athenatravels.in,,23/02/2026,11/8/2026
+1 - 15 Days,2026-02-24,259733,invoice,overdue,Alpinesoft IT Solutions Pvt. Ltd.,3.0,2463733.80,1463733.80,Srilakshmi,tarc.in,,24/02/2026,23/02/2027
+1 - 15 Days,2026-02-24,259768,invoice,overdue,enAPPS IoT,3.0,9204.00,9204.00,Sireesha,ntegratedshipping.com,,24/02/2026,23/02/2027
+1 - 15 Days,2026-02-25,259800,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,2.0,384456.00,384456.00,Srilakshmi,it-upw.in,,15/01/2026,14/01/2027
+1 - 15 Days,2026-02-25,259801,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,2.0,384456.00,384456.00,Srilakshmi,it-nwr.in,,12/12/2025,11/12/2026
+1 - 15 Days,2026-02-25,259802,invoice,overdue,SHRUTI INFOTECH PRIVATE LIMITED,2.0,39565.00,39565.00,Srilakshmi,direb.net,,19/01/2026,18/01/2027
+1 - 15 Days,2026-02-25,259795,invoice,overdue,Pannai Moondradaippu Educational Trust,2.0,3823.00,3823.00,Shravya,pmedutrust.org,,14/02/2026,13/02/2027
+1 - 15 Days,2026-02-25,259799,invoice,overdue,Tech I Secure Pvt. Ltd.,2.0,10974.00,10974.00,Sireesha,shreesadhk.com,,2/12/2025,1/12/2026
+1 - 15 Days,2026-02-25,259794,invoice,overdue,SRI SAPTHAGIRI SRINIVASA ENTERPRISES PRIVATE LIMITED,2.0,75579.00,75579.00,Vijay,gdhotels.in,,25/02/2026,24/02/2027
+1 - 15 Days,2026-02-25,259803,invoice,overdue,NEPHROCARE HEALTH SERVICES LIMITED,2.0,2599.00,2599.00,Vijay,CLAUDE.AI,,18/02/2026,18/02/2026
+1 - 15 Days,2026-02-25,259805,invoice,overdue,GREAT DESTINATIONS HOSPITALITY PRIVATE LIMITED,2.0,97822.00,97822.00,Vijay,gdhotels.in,,25/02/2026,24/02/2027
+1 - 15 Days,2026-02-25,259806,invoice,overdue,GREAT DESTINATIONS HOSPITALITY PRIVATE LIMITED,2.0,15930.00,15930.00,Vijay,myspacehotels.com,,25/02/2026,24/02/2027
+1 - 15 Days,2026-02-25,259808,invoice,overdue,ADSCHOLARS MARKETING INDIA PRIVATE LIMITED,2.0,2908.00,2908.00,Sireesha,adscholars.com,,25/02/2026,19/07/2026
+1 - 15 Days,2026-02-25,259809,invoice,overdue,Giappy S.A.S,2.0,6278.39,6278.39,Sireesha,tranquifinanzas.com,,25/02/2026,23/04/2026
+1 - 15 Days,2026-02-26,259837,invoice,overdue,Giappy S.A.S,1.0,4269.09,4269.09,Sireesha,tranquifinanzas.com,,9/10/2025,23/04/2026
+1 - 15 Days,2026-02-26,259831,invoice,overdue,Mindworks Solutions Pvt. Ltd.,1.0,18290.00,18290.00,Srilakshmi,whitespacedesign.in,,9/2/2026,8/2/2027
+1 - 15 Days,2026-02-26,259835,invoice,overdue,VEDANTU INNOVATIONS PRIVATE LIMITED,1.0,37581.00,37581.00,Srilakshmi,v.ganesan@vedantu.com,,17/03/2026,16/03/2027
+1 - 15 Days,2026-02-26,259832,invoice,overdue,Circle Out IT Solutions LLC,1.0,3123.00,3123.00,Sireesha,mhrealestate.ae,,26/02/2026,14/11/2026
+Current,2026-02-01,259222,invoice,sent,SRI PRIYANKA GEO COMMEX LIMITED,,43896.00,43896.00,Sireesha,spgeocl.Com,,1/3/2026,28/02/2027
+Current,2026-02-01,259279,invoice,sent,CENTIBELL LIGHTING PRIVATE LIMITED,,3823.00,3823.00,Shravya,rishiequipment.com,,2/4/2026,1/4/2027
+Current,2026-02-04,259001,invoice,sent,APOLLODART KI SOLUTIONS PRIVATE LIMITED,,200836.00,200836.00,Sireesha,apollodart.com ,,4/3/2026,3/3/2027
+Current,2026-02-04,259006,invoice,sent,Abhilash. S,,25606.00,25606.00,Sireesha,brighteraoman.com,,5/3/2026,4/3/2027
+Current,2026-02-04,259011,invoice,sent,Mind your Excel,,3823.00,3823.00,Shravya,mindyourExcel.com,,4/3/2026,3/3/2027
+Current,2026-02-04,259013,invoice,sent,MARKS MEDIA,,7316.00,7316.00,Sireesha, fluxtronics.in,,5/3/2026,4/3/2027
+Current,2026-02-04,259015,invoice,sent,BHUPAL INFRASTRUCTURE PRIVATE LIMITED,,130978.00,130978.00,Sireesha,bhupalinfra.com,,5/3/2026,4/3/2027
+Current,2026-02-04,258958,invoice,sent,ORGANISATION FOR DEVELOPMENT INTEGRATED SOCIAL AND HEALTH ACTION,,29264.00,29264.00,Sireesha,odishabc.com,,3/3/2026,2/3/2027
+Current,2026-02-04,258959,invoice,sent,W Beyond,,45165.00,45165.00,Sireesha,wbeyond.co,,3/3/2026,2/3/2027
+Current,2026-02-04,258960,invoice,sent,Sayyeda Fathema,,32922.00,32922.00,Sireesha,holacapitals.com ,,2/3/2026,1/3/2027
+Current,2026-02-04,258961,invoice,sent,Mindworks Solutions Pvt. Ltd.,,32922.00,32922.00,Srilakshmi,meridianmarketresources.com,,4/3/2026,3/3/2027
+Current,2026-02-04,258968,invoice,sent,Magnes Energy India LLP,,29264.00,29264.00,Sireesha,republicofkarting.com,,4/3/2026,3/3/2027
+Current,2026-02-04,258969,invoice,sent,Mindworks Solutions Pvt. Ltd.,,21948.00,21948.00,Srilakshmi,sindhischoolkkr.com,,4/3/2026,3/3/2027
+Current,2026-02-04,258970,invoice,sent,"Registrar , Guru Ghasidas Vishwavidyakaya, koni Bilaspur (CG)",,1982.00,1982.00,Shravya,education07.org ,,4/3/2026,3/3/2027
+Current,2026-02-04,259043,invoice,sent,Rahul Dobwal,,15293.00,15293.00,Shravya, teasydigital.com ,,5/3/2026,4/3/2027
+Current,2026-02-04,259046,invoice,sent,LIGHTRIGHT PRIVATE LIMITED,,19116.00,19116.00,Sireesha,lightright.in,,4/3/2026,3/3/2027
+Current,2026-02-05,259017,invoice,sent,AL BUSHRA TOURS AND TRAVELS,,20036.00,20036.00,Srilakshmi,Anydesk,,18/03/2026,17/03/2027
+Current,2026-02-05,258957,invoice,sent,BRIJTECH INFRAVISION PRIVATE LIMITED,,130980.00,130980.00,Sireesha,brijtechinfra.com ,,4/3/2026,3/3/2027
+Current,2026-02-05,259075,invoice,sent,INBOXMATTERS MEDIA PRIVATE LIMITED,,7465.00,7465.00,Sireesha,haryanavritant.com,,5/3/2025,4/3/2027
+Current,2026-02-05,259076,invoice,sent,MARKS MEDIA,,3658.00,3658.00,Sireesha,krishnaengs.com,,5/3/2026,4/3/2027
+Current,2026-02-05,259079,invoice,sent,YH Softcloud,,3304.00,3304.00,Sireesha,travana.com.au,,7/3/2026,6/3/2027
+Current,2026-02-05,259082,invoice,sent,IMEDd - Innovative Medical Devices,,74293.00,74293.00,Sireesha,imedd.in,,7/3/2026,13/03/2027
+Current,2026-02-05,259083,invoice,sent,INBOXMATTERS MEDIA PRIVATE LIMITED,,135346.00,135346.00,Sireesha,inboxmattersdigital.com ,,7/3/2026,6/3/2027
+Current,2026-02-05,259084,invoice,sent,TARNEA TECHNOLOGY SOLUTIONS PVT LTD,,310930.00,310930.00,Sireesha,tarnea.com ,,7/3/2026,6/3/2027
+Current,2026-02-06,259085,invoice,sent,Indo Bogher Plant Science Private Limited,,14859.00,14859.00,Shravya,indobogher.com,,7/3/2026,13/04/2027
+Current,2026-02-06,259114,invoice,sent,YH Softcloud,,14868.00,14868.00,Sireesha,cctsupport.com.au,,8/3/2026,7/3/2027
+Current,2026-02-07,258962,invoice,sent,SHRUTI INFOTECH PRIVATE LIMITED,,384456.00,384456.00,Srilakshmi,It-bbsr.in,,4/3/2026,3/3/2027
+Current,2026-02-07,258971,invoice,sent,SHRUTI INFOTECH PRIVATE LIMITED,,384456.00,384456.00,Srilakshmi,it-tn.in,,4/3/2026,3/3/2027
+Current,2026-02-07,259066,invoice,sent,Alphion India Private Limited,,215197.00,215197.00,Srilakshmi,Anydesk,,7/3/2026,6/3/2027
+Current,2026-02-07,259078,invoice,sent,SHRUTI INFOTECH PRIVATE LIMITED,,384456.00,384456.00,Srilakshmi,it-kg.in,,7/3/2026,6/3/2027
+Current,2026-02-07,259138,invoice,sent,Bhojani Marine,,3823.00,3823.00,Shravya,bhojanimarine.co.in,,9/3/2026,8/3/2027
+Current,2026-02-09,259115,invoice,sent,The Registrar ICARE Complex,,4720.00,4720.00,Vijay,gisthaldia.org ,,8/3/2026,7/3/2027
+Current,2026-02-10,259120,invoice,sent,Digiclove Technologies Pvt Ltd,,11564.00,11564.00,Sireesha, digiclove.com,,8/3/2026,7/3/2027
+Current,2026-02-10,259341,invoice,sent,BeyondTech IT Solutions,,1947.00,1947.00,Sireesha,smartcode.com.sa,,11/2/2026,10/2/2027
+Current,2026-02-11,259137,invoice,sent,Trillion IT Services Pvt Ltd,,38232.00,38232.00,Sireesha,apcnutrients.com,,9/3/2026,8/3/2027
+Current,2026-02-16,259335,invoice,sent,BeyondTech IT Solutions,,15281.00,15281.00,Sireesha,asl-tr.com,,10/2/2026,9/2/2027
+Current,2026-02-17,259582,invoice,sent,BeyondTech IT Solutions,,23128.00,23128.00,Sireesha,tawasolsms.com,,17/02/2026,16/04/2026
+Current,2026-02-18,259189,invoice,sent,The President / Secretary General,,7316.00,7316.00,Shravya,sambo.in,,11/3/2026,10/3/2027
+Current,2026-02-18,259459,invoice,sent,Circle Out IT Solutions LLC,,8700.00,8700.00,Sireesha,poolmasters.ae,,10/3/2026,9/3/2027
+Current,2026-02-18,259616,invoice,sent,Circle Out IT Solutions LLC,,8700.00,8700.00,Sireesha,snowdenworld.com,,10/3/2026,9/3/2027
+Current,2026-02-19,259396,invoice,sent,Circle Out IT Solutions LLC,,4350.00,4350.00,Sireesha,netwits.ae,,13/03/2026,12/3/2027
+Current,2026-02-19,259636,invoice,sent,BeyondTech IT Solutions,,10915.00,10915.00,Sireesha,5D.com.sa,,19/02/2026,18/02/2027
+Current,2026-02-20,259454,invoice,sent,Bodyculture Tatoo,,3823.00,3823.00,Shravya,bodyculture.in,,15/03/2026,14/03/2027
+Current,2026-02-20,259667,invoice,sent,BeyondTech IT Solutions,,238313.00,238313.00,Sireesha,move.med.sa,,21/02/2026,20/02/2027
+Current,2026-02-27,259558,invoice,sent,Seema Banda,,58528.00,58528.00,Sireesha,sblawoffice.us,,23/03/2026,22/03/2027
+Current,2026-02-27,259624,invoice,sent,Myvacations,,37200.00,37200.00,Sireesha,mygibraltar.co.uk,,20/03/2026,19/03/2027
+Current,2026-02-27,259858,invoice,sent,Sysin Technologies LLP,,4765.00,4765.00,Sireesha,airguideindia.com,,27/02/2026,7/11/2026
+Current,2026-02-27,259859,invoice,sent,Circle Out IT Solutions LLC,,4350.00,4350.00,Sireesha,sigmaexperts.ae,,27/02/2026,26/02/2027
+Current,2026-02-27,259863,invoice,sent,Frizzon Services Private Limited,,168221.00,168221.00,Sireesha,frizzon.co ,,22/03/2026,21/03/2027
+Current,2026-02-27,259865,invoice,sent,PUR ENERGY PRIVATE LIMITED,,69547.00,69547.00,Vamsi,purenergy.co.in,,1/2/2026,28/02/2026
+Current,2026-02-27,259866,invoice,sent,Basavatarakam Indo American Cancer Hospital & Research Institute,,34456.00,34456.00,Sireesha,Basavatarakam.org,,23/02/2026,15/12/2026

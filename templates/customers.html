@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Customers</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body onload="loadCustomersPage()">
+
+    <nav class="navbar">
+        <!-- LEFT: Brand -->
+        <a class="navbar-brand" href="/upload-page">
+            Zoho Overdues
+        </a>
+
+        <!-- CENTER: Navigation -->
+        <div class="navbar-nav">
+            <a href="/upload-page">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
+            <a href="/customers-page" class="active">Customers</a>
+            {% if role != 'admin' %}<a href="/my-tasks-page">My Tasks</a>{% endif %}
+            {% if role == 'admin' %}
+            <a href="/agent-page">Agents</a>
+            <a href="/create-task-page">Create Task</a>
+            <a href="/assigned-tasks">Assigned Tasks</a>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT: Date + Logout -->
+        <div class="navbar-right">
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">
+                    {{ username[0] if username else 'U' }}
+                </div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+
+        <div style="margin-bottom: 20px; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+            <label style="font-weight: bold; color: #666;">Sort by Due:</label>
+            <select id="dueSort" onchange="sortCustomers()" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; outline: none;">
+                <option value="none">Default</option>
+                <option value="high">High to Low</option>
+                <option value="low">Low to High</option>
+            </select>
+        </div>
+
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">S.No</th>
+                    <th>Customer Name</th>
+                    <th>Total Due</th>
+                    <th>No. of Invoices</th>
+                </tr>
+            </thead>
+
+            <tbody id="customerTable"></tbody>
+        </table>
+
+    </div>
+
+    <div id="invoicePopup" class="popup hidden"></div>
+
+    <script src="/static/script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Upload Data</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .upload-grid {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 30px auto;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .upload-container {
+            flex: 1;
+            min-width: 350px;
+            max-width: 500px;
+            padding: 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 0;
+            border: 1px solid #eee;
+        }
+
+        .history-container {
+            flex: 1;
+            min-width: 350px;
+            max-width: 600px;
+            padding: 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #eee;
+            max-height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-container h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-tag {
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #f0f0f0;
+        }
+
+        .upload-box {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-box:hover {
+            border-color: #007bff;
+        }
+
+        .btn-upload {
+            background: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-upload:disabled {
+            background: #ccc;
+        }
+
+        #statusMessage {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* === COMMENT MODAL === */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 480px;
+            max-width: 95vw;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-box h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #1976d2;
+            border-bottom: 1px solid #e3f2fd;
+            padding-bottom: 10px;
+        }
+
+        .modal-box textarea {
+            width: 100%;
+            height: 160px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+
+        .modal-box textarea:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-modal-save {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-modal-delete {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-modal-cancel {
+            background: #eee;
+            color: #333;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-comment-open {
+            background: none;
+            border: 1px solid #1976d2;
+            color: #1976d2;
+            padding: 3px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .btn-comment-open.has-comment {
+            background: #e3f2fd;
+            font-weight: bold;
+        }
+
+        /* === CHANGE HIGHLIGHTS === */
+        tr.flag-new td {
+            background: #e8f5e9 !important;
+        }
+
+        tr.flag-updated td {
+            background: #fffde7 !important;
+        }
+
+        tr.flag-removed td {
+            background: #fce4ec !important;
+            opacity: 0.7;
+        }
+
+        /* === BADGES === */
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-new {
+            background: #4caf50;
+            color: white;
+        }
+
+        .badge-updated {
+            background: #fbc02d;
+            color: white;
+        }
+
+        .badge-removed {
+            background: #e91e63;
+            color: white;
+        }
+
+        .badge-unchanged {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        /* === TOAST === */
+        #uploadToast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <!-- LEFT: Brand -->
+        <a class="navbar-brand" href="/upload-page">
+            Zoho Overdues
+        </a>
+
+        <!-- CENTER: Navigation -->
+        <div class="navbar-nav">
+            <a href="/upload-page" class="active">Dashboard</a>
+            <a href="/uploads-history-page">Recent History</a>
+            <a href="/customers-page">Customers</a>
+            {% if role != 'admin' %}<a href="/my-tasks-page">My Tasks</a>{% endif %}
+            {% if role == 'admin' %}
+            <a href="/agent-page">Agents</a>
+            <a href="/create-task-page">Create Task</a>
+            <a href="/assigned-tasks">Assigned Tasks</a>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT: Date + Profile -->
+        <div class="navbar-right">
+            <span class="navbar-date" id="todayDateDisplay"></span>
+
+            <div class="profile-container" onclick="this.classList.toggle('open')">
+                <div class="profile-avatar">
+                    {{ username[0] if username else 'U' }}
+                </div>
+                <div class="profile-dropdown">
+                    <div class="profile-info">
+                        <p class="profile-name">{{ username }}</p>
+                        <p class="profile-role">{{ role }}</p>
+                    </div>
+                    <button class="logout-btn-new" onclick="logout()">&#128274; Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="page-container" style="margin-top: 10px;">
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 40px 0;">
+
+        <h2 style="text-align: center; color: #333;">Daily Dashboard (Uploaded Data)</h2>
+
+        <!-- SUMMARY CARDS -->
+        <div class="dashboard-row"
+            style="margin-bottom: 30px; gap: 30px; display: flex; justify-content: center; flex-wrap: wrap;">
+            <div class="card" style="height: 120px; width: 220px; padding: 15px;">
+                <h4 style="margin: 0; color: #666;">Total Value</h4>
+                <p id="dailyTotalValue" class="card-value" style="font-size: 22px; color: #007bff; margin-top: 10px;">₹
+                    0</p>
+            </div>
+            <div class="card" style="height: 120px; width: 220px; padding: 15px;">
+                <h4 style="margin: 0; color: #666;">Total Due</h4>
+                <p id="dailyTotalDue" class="card-value" style="font-size: 22px; color: #dc3545; margin-top: 10px;">₹ 0
+                </p>
+            </div>
+            <div class="card" style="height: 120px; width: 220px; padding: 15px;">
+                <h4 style="margin: 0; color: #666;">Records</h4>
+                <p id="dailyCount" class="card-value" style="font-size: 22px; margin-top: 10px;">0</p>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters"
+            style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
+
+            <input type="text" id="custFilter" placeholder="Search Customer, Agent or Txn..."
+                oninput="handleFilterInput()" style="padding:10px;border:1px solid #ccc;border-radius:4px;width:180px;">
+
+            <select id="statusFilter" onchange="handleFilterInput()"
+                style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+                <option value="">All Status</option>
+                <option value="overdue">Overdue</option>
+                <option value="sent">Sent</option>
+            </select>
+
+            <select id="ageingFilter" onchange="handleFilterInput()"
+                style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+                <option value="">All Ageing</option>
+                <option value=">45 Days">>45 Days</option>
+                <option value="31 - 45 Days">31 - 45 Days</option>
+                <option value="16 - 30 Days">16 - 30 Days</option>
+                <option value="1 - 15 Days">1 - 15 Days</option>
+                <option value="Current">Current</option>
+            </select>
+
+            {% if role == 'admin' %}
+            <select id="ownerFilter" onchange="handleFilterInput()"
+                style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+                <option value="">All Owners</option>
+            </select>
+            {% endif %}
+
+            <select id="changeFilter" onchange="handleFilterInput()"
+                style="padding:10px;border:1px solid #ccc;border-radius:4px; border-left: 4px solid #1976d2;">
+                <option value="">All Changes</option>
+                <option value="new">New Added</option>
+                <option value="updated">Values Updated</option>
+                <option value="removed">Removed Records</option>
+                <option value="unchanged">Unchanged</option>
+            </select>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+                <label
+                    style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">From</label>
+                <input type="date" id="startDateFilter" onchange="handleFilterInput()"
+                    style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+                <label
+                    style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">To</label>
+                <input type="date" id="endDateFilter" onchange="handleFilterInput()"
+                    style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+                <label
+                    style="font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Filter
+                    Column</label>
+                <select id="dateSortField" onchange="handleFilterInput()"
+                    style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+                    <option value="date">Invoice Date</option>
+                    <option value="start">Start Date</option>
+                    <option value="end">End Date</option>
+                </select>
+            </div>
+
+            <select id="sortField" onchange="handleFilterInput()"
+                style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+                <option value="" selected>Sort by...</option>
+                <option value="amount">Sort by Amount</option>
+                <option value="due">Sort by Balance Due</option>
+                <option value="customer">Sort by Customer</option>
+                <option value="age">Sort by Age</option>
+            </select>
+
+            <select id="sortOrder" onchange="handleFilterInput()"
+                style="padding:10px;border:1px solid #ccc;border-radius:4px;">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+            </select>
+
+            <button id="filterBtn" onclick="applyDailyFilters()"
+                style="background:#28a745;border:none;padding:10px 25px;color:white;border-radius:5px;cursor:pointer;font-weight:bold; transition: background 0.2s;">
+                Apply Filters
+            </button>
+
+            <a href="/download-data"
+                style="background:#1976d2;border:none;padding:10px 20px;color:white;border-radius:5px;cursor:pointer;font-weight:bold;text-decoration:none;">
+                ↓ Download Excel
+            </a>
+
+            {% if role == 'admin' %}
+            <button onclick="clearAllDailyData()"
+                style="background:#d32f2f;border:none;padding:10px 20px;color:white;border-radius:5px;cursor:pointer;font-weight:bold;">
+                🗑️ Clear All
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="table-container">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">S.No</th>
+                        <th>Change</th>
+                        <th>Transaction No</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Customer</th>
+                        <th style="min-width:120px;">Amount</th>
+                        <th style="min-width:120px;">Balance</th>
+                        <th>Age</th>
+                        <th>Ageing</th>
+                        <th>Status</th>
+                        <th>Owner</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Custom Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dailyTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- NEW INVOICES TABLE -->
+        <div id="newSection" class="hidden" style="margin-top: 50px;">
+            <h2 style="color: #2e7d32; display: flex; align-items: center; gap: 10px;">
+                <span style="background: #e8f5e9; padding: 5px 12px; border-radius: 20px; font-size: 14px;">Found
+                    New</span>
+                New Invoices Added
+                <span id="newCount" style="font-size: 16px; color: #666;">(0)</span>
+            </h2>
+            <div class="table-container" style="border-top: 3px solid #4caf50;">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">S.No</th>
+                            <th>Transaction</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Balance</th>
+                            <th>Ageing</th>
+                            <th>Status</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Owner</th>
+                            <th>Custom Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="newTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- UPDATED INVOICES TABLE -->
+        <div id="updatedSection" class="hidden" style="margin-top: 50px;">
+            <h2 style="color: #f57f17; display: flex; align-items: center; gap: 10px;">
+                <span
+                    style="background: #fffde7; padding: 5px 12px; border-radius: 20px; font-size: 14px;">Detected</span>
+                Updated Records
+                <span id="updatedCount" style="font-size: 16px; color: #666;">(0)</span>
+            </h2>
+            <div class="table-container" style="border-top: 3px solid #fbc02d;">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">S.No</th>
+                            <th>Transaction</th>
+                            <th>Customer</th>
+                            <th>Old Amount</th>
+                            <th>New Balance</th>
+                            <th>Ageing</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Owner</th>
+                            <th>Prev Status</th>
+                            <th style="width:200px;">Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="updatedTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- REMOVED / NEEDS UPDATE TABLE -->
+        <div id="removedSection" class="hidden" style="margin-top: 50px; margin-bottom: 50px;">
+            <h2 style="color: #c62828; display: flex; align-items: center; gap: 10px;">
+                <span
+                    style="background: #fce4ec; padding: 5px 12px; border-radius: 20px; font-size: 14px;">Missing</span>
+                Needs Update / Removed from Sheet
+                <span id="removedCount" style="font-size: 16px; color: #666;">(0)</span>
+            </h2>
+            <p style="color: #666; font-size: 13px; margin-bottom: 10px; margin-left: 5px;">These invoices were in the
+                system but are missing from the latest upload. They are likely PAID or closed.</p>
+            <div class="table-container" style="border-top: 3px solid #e91e63;">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">S.No</th>
+                            <th>Transaction</th>
+                            <th>Customer</th>
+                            <th>Prev Balance</th>
+                            <th>Owner</th>
+                            <th>Status</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="removedTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dailyData = [];
+
+        window.onload = () => {
+            const today = new Date();
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('todayDateDisplay').innerText = "Today: " + today.toLocaleDateString('en-IN', options);
+
+            loadUploadedData();
+        };
+
+        async function loadUploadHistory() {
+            try {
+                const res = await fetch('/upload-history');
+                const history = await res.json();
+                const list = document.getElementById("historyList");
+
+                if (history.length === 0) {
+                    list.innerHTML = `<p style="text-align: center; color: #999; margin-top: 20px;">No upload history found.</p>`;
+                    return;
+                }
+
+                list.innerHTML = "";
+                history.forEach((h, idx) => {
+                    const statsHtml = h.stats.split(',').map(s => {
+                        const parts = s.split(':');
+                        const label = parts[0].trim();
+                        const val = parts[1] ? parts[1].trim() : '0';
+                        return `<span class="stat-tag"><b>${val}</b> ${label}</span>`;
+                    }).join('');
+
+                    const deleteBtn = "{{ role }}" === "admin"
+                        ? `<button class="btn-delete-history" onclick="deleteHistory(${h.id})" title="Delete this record">🗑️</button>`
+                        : '';
+
+                    list.innerHTML += `
+                        <div class="history-item">
+                            <span class="file-name">
+                                ${idx + 1}. 
+                                <a href="/download-history/${h.id}" target="_blank" style="text-decoration: none; color: #1976d2; font-weight: bold;" title="Click to download">
+                                    📄 ${h.filename}
+                                </a>
+                            </span>
+                            ${deleteBtn}
+                            <div class="meta">${h.date} • by ${h.user}</div>
+                            <div class="stats">${statsHtml}</div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error("Failed to load history", err);
+            }
+        }
+
+        async function deleteHistory(id) {
+            if (!confirm("Are you sure you want to delete this upload history and its file?")) return;
+
+            try {
+                const res = await fetch(`/delete-history/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadUploadHistory();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || "Failed to delete history");
+                }
+            } catch (err) {
+                alert("Network error occurred while deleting.");
+            }
+        }
+
+        function populateOwnerDropdown(data) {
+            const owners = [...new Set(data.map(i => i.owner).filter(Boolean))];
+            const dropdown = document.getElementById("ownerFilter");
+            if (!dropdown) return; // Non-admin users do not have this dropdown
+            dropdown.innerHTML = `<option value="">All Owners</option>`;
+            owners.forEach(o => {
+                dropdown.innerHTML += `<option value="${o}">${o}</option>`;
+            });
+        }
+
+        function formatDate(str) {
+            if (!str) return "N/A";
+            const date = new Date(str);
+            if (isNaN(date.getTime())) return str;
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return `${date.getDate()}-${months[date.getMonth()]}-${date.getFullYear()}`;
+        }
+
+        async function loadUploadedData() {
+            try {
+                const res = await fetch('/uploaded-data');
+                dailyData = await res.json();
+
+                // 1. Initial render of specific change tables
+                renderChangeTables(dailyData);
+
+                // 2. Initial render of main table (only active)
+                const activeData = dailyData.filter(i => i.is_active);
+                populateOwnerDropdown(activeData);
+                updateSummary(activeData);
+                renderDailyTable(activeData);
+
+            } catch (err) {
+                console.error("Failed to load daily data", err);
+            }
+        }
+
+        function updateSummary(data) {
+            // Only sum up active records (excluding removed)
+            const activeData = data.filter(i => i.is_active);
+
+            const totalValue = activeData.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+            const totalDue = activeData.reduce((sum, i) => sum + (Number(i.due) || 0), 0);
+
+            document.getElementById('dailyTotalValue').innerText = "₹ " + totalValue.toLocaleString("en-IN");
+            document.getElementById('dailyTotalDue').innerText = "₹ " + totalDue.toLocaleString("en-IN");
+            document.getElementById('dailyCount').innerText = activeData.length;
+        }
+
+        function renderDailyTable(data) {
+            const table = document.getElementById('dailyTableBody');
+            table.innerHTML = "";
+
+            if (data.length === 0) {
+                table.innerHTML = "<tr><td colspan='14' style='text-align:center; padding: 20px; color:#999;'>No records found</td></tr>";
+                return;
+            }
+
+            data.forEach((i, idx) => {
+                const flag = i.change_flag || "unchanged";
+                const flagClass = `flag-${flag}`;
+
+                const statusTag = i.status === 'overdue' ? `<span class="tag tag-overdue">Overdue</span>` : `<span class="tag tag-sent">${i.status || 'Sent'}</span>`;
+                const badgeMap = {
+                    'new': '<span class="badge badge-new">New</span>',
+                    'updated': '<span class="badge badge-updated">Updated</span>',
+                    'removed': '<span class="badge badge-removed">Removed</span>',
+                    'unchanged': ''
+                };
+                const changeBadge = badgeMap[flag] || '';
+
+                const cleanDate = formatDate(i.date);
+                const cleanStart = formatDate(i.start);
+                const cleanEnd = formatDate(i.end);
+
+                const statusOptions = ['Pending', 'Paid', 'Not Paid', 'Not Updated', 'Others'];
+                const csOpts = statusOptions.map(s =>
+                    `<option value="${s}" ${i.custom_status === s ? 'selected' : ''}>${s}</option>`
+                ).join('');
+
+                table.innerHTML += `
+                <tr class="${flagClass}">
+                    <td style="color:#666; font-size:11px;">${i.serial_no || (idx + 1)}</td>
+                    <td>${changeBadge}</td>
+                    <td style="font-weight: bold;">${i.invoice}</td>
+                    <td>${cleanDate}</td>
+                    <td>${i.type}</td>
+                    <td>${i.customer}</td>
+                    <td style="font-weight: 500;">₹ ${Number(i.amount).toLocaleString("en-IN")}</td>
+                    <td style="font-weight: 600; color: #d32f2f;">₹ ${Number(i.due).toLocaleString("en-IN")}</td>
+                    <td>${i.age}</td>
+                    <td><span class="tag" style="background:#e3f2fd; color:#0d47a1; border:1px solid #bbdefb; min-width:80px;">${i.ageing || ''}</span></td>
+                    <td>${statusTag}</td>
+                    <td>${i.owner}</td>
+                    <td><span class="date-highlight">${cleanStart}</span></td>
+                    <td><span class="date-highlight" style="background: #fff3e0; color: #e65100; border-color: #ffe0b2;">${cleanEnd}</span></td>
+                    <td>
+                        <select class="custom-status-select" onchange="updateStatus(${i.id}, this.value)" style="font-size: 11px; padding: 4px;">
+                            ${csOpts}
+                        </select>
+                    </td>
+                    <td style="text-align:center;">
+                        <button class="btn-comment-open ${i.comments ? 'has-comment' : ''}" 
+                            onclick="openCommentModal(${i.id}, \`${(i.comments || '').replace(/`/g, "'")}\`, \`${(i.customer || '').replace(/`/g, "'")}\`)">
+                            ${i.comments ? '💬' : '+'}
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function renderChangeTables(allData) {
+            const newList = allData.filter(i => i.change_flag === 'new' && i.is_active);
+            const updatedList = allData.filter(i => i.change_flag === 'updated' && i.is_active);
+            const removedList = allData.filter(i => i.change_flag === 'removed' || !i.is_active);
+
+            // ── NEW INVOICES ──
+            const newSec = document.getElementById("newSection");
+            const newTbody = document.getElementById("newTableBody");
+            document.getElementById("newCount").innerText = `(${newList.length})`;
+            if (newList.length > 0) {
+                newSec.classList.remove("hidden");
+                newTbody.innerHTML = newList.map((i, idx) => `
+                    <tr>
+                        <td style="color:#666; font-size:11px;">${idx + 1}</td>
+                        <td style="font-weight:bold;">${i.invoice}</td>
+                        <td>${i.customer}</td>
+                        <td>₹ ${Number(i.amount).toLocaleString("en-IN")}</td>
+                        <td style="color:#d32f2f;">₹ ${Number(i.due).toLocaleString("en-IN")}</td>
+                        <td><span class="tag" style="background:#e3f2fd; color:#0d47a1; border:1px solid #bbdefb; font-size:9px;">${i.ageing || ''}</span></td>
+                        <td>${i.status}</td>
+                        <td><span class="date-highlight" style="font-size:9px;">${formatDate(i.start)}</span></td>
+                        <td><span class="date-highlight" style="background: #fff3e0; color: #e65100; border-color: #ffe0b2; font-size:9px;">${formatDate(i.end)}</span></td>
+                        <td>${i.owner}</td>
+                        <td><span class="badge badge-new" style="font-size:9px;">${i.custom_status}</span></td>
+                    </tr>
+                `).join("");
+            } else {
+                newSec.classList.add("hidden");
+            }
+
+            // ── UPDATED RECORDS ──
+            const updatedSec = document.getElementById("updatedSection");
+            const updatedTbody = document.getElementById("updatedTableBody");
+            document.getElementById("updatedCount").innerText = `(${updatedList.length})`;
+            if (updatedList.length > 0) {
+                updatedSec.classList.remove("hidden");
+                updatedTbody.innerHTML = updatedList.map((i, idx) => `
+                    <tr class="flag-updated">
+                        <td style="color:#666; font-size:11px;">${idx + 1}</td>
+                        <td style="font-weight:bold;">${i.invoice}</td>
+                        <td>${i.customer}</td>
+                        <td>₹ ${Number(i.amount).toLocaleString("en-IN")}</td>
+                        <td style="color:#f57f17; font-weight:bold;">₹ ${Number(i.due).toLocaleString("en-IN")}</td>
+                        <td><span class="tag" style="background:#e3f2fd; color:#0d47a1; border:1px solid #bbdefb; font-size:9px;">${i.ageing || ''}</span></td>
+                        <td><span class="date-highlight" style="font-size:9px;">${formatDate(i.start)}</span></td>
+                        <td><span class="date-highlight" style="background: #fff3e0; color: #e65100; border-color: #ffe0b2; font-size:9px;">${formatDate(i.end)}</span></td>
+                        <td>${i.owner}</td>
+                        <td>${i.status}</td>
+                        <td><button class="btn-comment-open" onclick="openCommentModal(${i.id}, \`${(i.comments || '').replace(/`/g, "'")}\`, \`${(i.customer || '').replace(/`/g, "'")}\`)">💬 View</button></td>
+                    </tr>
+                `).join("");
+            } else {
+                updatedSec.classList.add("hidden");
+            }
+
+            // ── REMOVED / NEEDS UPDATE ──
+            const removedSec = document.getElementById("removedSection");
+            const removedTbody = document.getElementById("removedTableBody");
+            document.getElementById("removedCount").innerText = `(${removedList.length})`;
+            if (removedList.length > 0) {
+                removedSec.classList.remove("hidden");
+                removedTbody.innerHTML = removedList.map((i, idx) => `
+                    <tr class="flag-removed">
+                        <td style="color:#666; font-size:11px;">${idx + 1}</td>
+                        <td style="font-weight:bold;">${i.invoice}</td>
+                        <td>${i.customer}</td>
+                        <td style="color:#666;">₹ ${Number(i.due).toLocaleString("en-IN")}</td>
+                        <td>${i.owner}</td>
+                        <td><span class="badge badge-removed">Removed</span></td>
+                        <td><button class="btn-comment-open" onclick="openCommentModal(${i.id}, \`${(i.comments || '').replace(/`/g, "'")}\`, \`${(i.customer || '').replace(/`/g, "'")}\`)">💬 View</button></td>
+                    </tr>
+                `).join("");
+            } else {
+                removedSec.classList.add("hidden");
+            }
+        }
+
+        function applyDailyFilters() {
+            let filtered = [...dailyData];
+            const cust = document.getElementById('custFilter').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const ageing = document.getElementById('ageingFilter').value;
+            const ownerEl = document.getElementById('ownerFilter');
+            const owner = ownerEl ? ownerEl.value : "";
+            const changeType = document.getElementById('changeFilter').value;
+            const startDate = document.getElementById('startDateFilter').value;
+            const endDate = document.getElementById('endDateFilter').value;
+            const dateSortField = document.getElementById('dateSortField').value; // 'start' or 'end'
+            const sortField = document.getElementById('sortField').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+
+            if (cust) {
+                // Search in Customer, Invoice/Transaction#, and Owner
+                filtered = filtered.filter(i =>
+                    (i.customer || "").toLowerCase().includes(cust) ||
+                    (i.invoice || "").toLowerCase().includes(cust) ||
+                    (i.owner || "").toLowerCase().includes(cust)
+                );
+            }
+            if (status) {
+                filtered = filtered.filter(i => i.status === status);
+            }
+            if (ageing) {
+                filtered = filtered.filter(i => i.ageing.toLowerCase() === ageing.toLowerCase());
+            }
+            if (owner) {
+                filtered = filtered.filter(i => i.owner === owner);
+            }
+            if (changeType) {
+                filtered = filtered.filter(i => i.change_flag === changeType);
+            }
+
+            // Date range filtering
+            // dateSortField controls WHICH date column (date / start / end) to filter against
+            const targetDateField = dateSortField; // already read above as dateSortField value
+
+            if (startDate || endDate) {
+                filtered = filtered.filter(i => {
+                    const rawVal = i[targetDateField]; // stored as "YYYY-MM-DD" from backend
+
+                    // If the record has no value for this date field, exclude it from
+                    // the filtered results only when a date range is active (makes sense
+                    // to not show records that have no date when the user is filtering by date)
+                    if (!rawVal || rawVal.trim() === "" || rawVal === "N/A") return false;
+
+                    // Normalise to YYYY-MM-DD for safe string comparison
+                    // Backend already stores as YYYY-MM-DD, so this is a safety net
+                    let normalised = rawVal;
+                    if (rawVal.includes("-") && rawVal.length === 10) {
+                        // Already ISO: "YYYY-MM-DD"
+                        normalised = rawVal;
+                    } else {
+                        // Try to parse if in another format
+                        const d = new Date(rawVal);
+                        if (!isNaN(d.getTime())) {
+                            normalised = d.toISOString().split("T")[0];
+                        }
+                    }
+
+                    if (startDate && normalised < startDate) return false;
+                    if (endDate && normalised > endDate) return false;
+                    return true;
+                });
+            }
+
+            // Determine effective sort field:
+            // If user picked one, use it; otherwise if a date range is active,
+            // auto-sort by the date column being filtered so results are ordered.
+            let effectiveSortField = sortField;
+            if (!effectiveSortField && (startDate || endDate)) {
+                effectiveSortField = targetDateField; // 'date', 'start', or 'end'
+            }
+
+            if (effectiveSortField) {
+                filtered.sort((a, b) => {
+                    let valA = a[effectiveSortField];
+                    let valB = b[effectiveSortField];
+
+                    if (['amount', 'due', 'age'].includes(effectiveSortField)) {
+                        valA = Number(valA) || 0;
+                        valB = Number(valB) || 0;
+                    } else if (['date', 'start', 'end'].includes(effectiveSortField)) {
+                        // Date comparison works fine with YYYY-MM-DD strings
+                        valA = valA || "";
+                        valB = valB || "";
+                    } else if (typeof valA === 'string') {
+                        valA = valA.toLowerCase();
+                        valB = valB.toLowerCase();
+                    }
+
+                    if (sortOrder === 'asc') return valA > valB ? 1 : -1;
+                    else return valA < valB ? 1 : -1;
+                });
+            }
+
+            renderDailyTable(filtered);
+            updateSummary(filtered);
+
+            // Change button to Reset state
+            const btn = document.getElementById('filterBtn');
+            btn.innerText = "Reset Filters";
+            btn.style.background = "#6c757d";
+            btn.onclick = resetDailyFilters;
+        }
+
+        function handleFilterInput() {
+            // Revert button to Apply state if user touches any filter
+            const btn = document.getElementById('filterBtn');
+            if (btn.innerText === "Reset Filters") {
+                btn.innerText = "Apply Filters";
+                btn.style.background = "#28a745";
+                btn.onclick = applyDailyFilters;
+            }
+        }
+
+        function resetDailyFilters() {
+            document.getElementById('custFilter').value = "";
+            document.getElementById('statusFilter').value = "";
+            document.getElementById('ageingFilter').value = "";
+            const ownerEl = document.getElementById('ownerFilter');
+            if (ownerEl) ownerEl.value = "";
+            document.getElementById('changeFilter').value = "";
+            document.getElementById('startDateFilter').value = "";
+            document.getElementById('endDateFilter').value = "";
+            document.getElementById('dateSortField').value = "date";
+            document.getElementById('sortField').value = "";
+            document.getElementById('sortOrder').value = "desc";
+
+
+            applyDailyFilters();
+
+            // Revert button to Apply state immediately after reset
+            const btn = document.getElementById('filterBtn');
+            btn.innerText = "Apply Filters";
+            btn.style.background = "#28a745";
+            btn.onclick = applyDailyFilters;
+        }
+
+        async function updateStatus(id, value) {
+            await fetch(`/update-record/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ custom_status: value })
+            });
+        }
+
+        let _activeCommentId = null;
+
+        function openCommentModal(id, currentComment, customerName) {
+            _activeCommentId = id;
+            document.getElementById('modalCustomerName').innerText = customerName || 'Invoice';
+            document.getElementById('modalCommentText').value = currentComment || '';
+            document.getElementById('commentModal').classList.add('open');
+            document.getElementById('modalCommentText').focus();
+        }
+
+        function closeCommentModal() {
+            document.getElementById('commentModal').classList.remove('open');
+            _activeCommentId = null;
+        }
+
+        async function saveModalComment() {
+            if (!_activeCommentId) return;
+            const value = document.getElementById('modalCommentText').value;
+            const res = await fetch(`/update-record/${_activeCommentId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ comments: value })
+            });
+            if (res.ok) {
+                closeCommentModal();
+                loadUploadedData();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Failed to save comment');
+            }
+        }
+
+        async function deleteComment() {
+            if (!_activeCommentId) return;
+            if (!confirm('Clear this comment?')) return;
+            const res = await fetch(`/update-record/${_activeCommentId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ comments: '' })
+            });
+            if (res.ok) {
+                closeCommentModal();
+                loadUploadedData();
+            }
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('fileInput');
+            const display = document.getElementById('fileNameDisplay');
+            if (input.files.length > 0) {
+                display.innerText = input.files[0].name;
+            }
+        }
+
+        async function handleUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const btn = document.getElementById('uploadBtn');
+            const status = document.getElementById('statusMessage');
+
+            if (fileInput.files.length === 0) {
+                alert("Please select a file first");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            btn.disabled = true;
+            btn.innerText = "Uploading...";
+            status.className = "hidden";
+
+            try {
+                const res = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await res.json();
+
+                status.classList.remove('hidden');
+                if (res.ok) {
+                    status.className = "success";
+                    status.innerText = "Sync complete!";
+                    showSummaryToast(result.stats);
+                    loadUploadedData(); // Refresh the table
+                    loadUploadHistory(); // Refresh history
+                } else {
+                    status.className = "error";
+                    status.innerText = result.error || "Upload failed";
+                }
+            } catch (err) {
+                status.classList.remove('hidden');
+                status.className = "error";
+                status.innerText = "Network error occurred";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Upload & Sync Data";
+            }
+        }
+
+        async function logout() {
+            await fetch("/logout", { credentials: "include" });
+            window.location = "/";
+        }
+
+        function showSummaryToast(stats) {
+            const toast = document.getElementById('uploadToast');
+            if (!stats) return;
+
+            toast.innerHTML = `
+                <div style="font-weight:bold; font-size:16px; margin-bottom:5px; border-bottom:1px solid #555; padding-bottom:5px;">
+                    Upload Summary
+                </div>
+                <div style="color:#81c784;">🟢 New Added: ${stats.added}</div>
+                <div style="color:#ffd54f;">🟡 Updated: ${stats.updated}</div>
+                <div style="color:#e57373;">🔴 Removed: ${stats.removed}</div>
+                <div style="color:#bbb;">⚪ Unchanged: ${stats.unchanged}</div>
+            `;
+
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 8000);
+        }
+        async function clearAllDailyData() {
+            if (!confirm("CRITICAL: This will remove ALL transaction data from the dashboard. This cannot be undone. \n\nAre you sure?")) return;
+
+            try {
+                const res = await fetch('/clear-all-data', { method: 'DELETE' });
+                if (res.ok) {
+                    alert("All data cleared successfully.");
+                    loadUploadedData(); // Refresh table
+                } else {
+                    const err = await res.json();
+                    alert(err.error || "Failed to clear data");
+                }
+            } catch (err) {
+                alert("Network error occurred.");
+            }
+        }
+    </script>
+
+    <!-- COMMENT MODAL -->
+    <div id="commentModal" class="modal-overlay" onclick="if(event.target===this) closeCommentModal()">
+        <div class="modal-box">
+            <h3>&#128172; Comment — <span id="modalCustomerName" style="color:#333;"></span></h3>
+            <textarea id="modalCommentText"
+                placeholder="Add your notes, follow-up updates, or payment status details here..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeCommentModal()">Cancel</button>
+                <button class="btn-modal-delete" onclick="deleteComment()">&#128465; Delete</button>
+                <button class="btn-modal-save" onclick="saveModalComment()">&#10003; Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST SUMMARY -->
+    <div id="uploadToast"></div>
+</body>
+
+</html>
