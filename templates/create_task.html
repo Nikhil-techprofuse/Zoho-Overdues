@@ -626,11 +626,11 @@
 
         // ── Summary ──
         function updateSummary(data) {
-            const totalDue = data.reduce((s, i) => s + (Number(i.due) || 0), 0);
-            const totalAmount = data.reduce((s, i) => s + (Number(i.amount) || 0), 0);
-            document.getElementById('sumCount').innerText = data.length;
-            document.getElementById('sumDue').innerText = '₹ ' + totalDue.toLocaleString('en-IN');
-            document.getElementById('sumAmount').innerText = '₹ ' + totalAmount.toLocaleString('en-IN');
+            const totalDue    = Math.round(data.reduce((s, i) => s + (parseFloat(i.due)    || 0), 0) * 100) / 100;
+            const totalAmount = Math.round(data.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0) * 100) / 100;
+            document.getElementById('sumCount').innerText  = data.length;
+            document.getElementById('sumDue').innerText    = '₹ ' + totalDue.toLocaleString('en-IN',    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('sumAmount').innerText = '₹ ' + totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         // ── Render table ──

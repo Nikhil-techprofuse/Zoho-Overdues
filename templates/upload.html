@@ -669,15 +669,17 @@
         }
 
         function updateSummary(data) {
-            // Only sum up active records (excluding removed)
-            const activeData = data.filter(i => i.is_active);
+            // Callers pass the exact set of records to summarise.
+            // We only strip truly-removed (is_active=false) rows when the
+            // caller hasn't already done so (e.g. initial load passes activeData).
+            const rows = data.filter(i => i.is_active !== false);
 
-            const totalValue = activeData.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
-            const totalDue = activeData.reduce((sum, i) => sum + (Number(i.due) || 0), 0);
+            const totalValue = Math.round(rows.reduce((sum, i) => sum + (parseFloat(i.amount) || 0), 0) * 100) / 100;
+            const totalDue   = Math.round(rows.reduce((sum, i) => sum + (parseFloat(i.due)    || 0), 0) * 100) / 100;
 
-            document.getElementById('dailyTotalValue').innerText = "₹ " + totalValue.toLocaleString("en-IN");
-            document.getElementById('dailyTotalDue').innerText = "₹ " + totalDue.toLocaleString("en-IN");
-            document.getElementById('dailyCount').innerText = activeData.length;
+            document.getElementById('dailyTotalValue').innerText = "₹ " + totalValue.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('dailyTotalDue').innerText   = "₹ " + totalDue.toLocaleString("en-IN",   { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('dailyCount').innerText = rows.length;
         }
 
         function renderDailyTable(data) {
@@ -820,21 +822,26 @@
         }
 
         function applyDailyFilters() {
-            let filtered = [...dailyData];
+            const changeType = document.getElementById('changeFilter').value;
+
+            // Start from active records only — unless the user has explicitly chosen
+            // to view "removed" records via the Change filter.
+            let filtered = changeType === 'removed'
+                ? dailyData.filter(i => !i.is_active)
+                : dailyData.filter(i => i.is_active);
+
             const cust = document.getElementById('custFilter').value.toLowerCase();
             const status = document.getElementById('statusFilter').value;
             const ageing = document.getElementById('ageingFilter').value;
             const ownerEl = document.getElementById('ownerFilter');
             const owner = ownerEl ? ownerEl.value : "";
-            const changeType = document.getElementById('changeFilter').value;
             const startDate = document.getElementById('startDateFilter').value;
             const endDate = document.getElementById('endDateFilter').value;
-            const dateSortField = document.getElementById('dateSortField').value; // 'start' or 'end'
+            const dateSortField = document.getElementById('dateSortField').value;
             const sortField = document.getElementById('sortField').value;
             const sortOrder = document.getElementById('sortOrder').value;
 
             if (cust) {
-                // Search in Customer, Invoice/Transaction#, and Owner
                 filtered = filtered.filter(i =>
                     (i.customer || "").toLowerCase().includes(cust) ||
                     (i.invoice || "").toLowerCase().includes(cust) ||
@@ -845,36 +852,29 @@
                 filtered = filtered.filter(i => i.status === status);
             }
             if (ageing) {
-                filtered = filtered.filter(i => i.ageing.toLowerCase() === ageing.toLowerCase());
+                filtered = filtered.filter(i => (i.ageing || '').toLowerCase() === ageing.toLowerCase());
             }
             if (owner) {
                 filtered = filtered.filter(i => i.owner === owner);
             }
-            if (changeType) {
+            // Apply change_flag sub-filter for active records (new / updated / unchanged)
+            if (changeType && changeType !== 'removed') {
                 filtered = filtered.filter(i => i.change_flag === changeType);
             }
 
             // Date range filtering
-            // dateSortField controls WHICH date column (date / start / end) to filter against
-            const targetDateField = dateSortField; // already read above as dateSortField value
+            const targetDateField = dateSortField;
 
             if (startDate || endDate) {
                 filtered = filtered.filter(i => {
-                    const rawVal = i[targetDateField]; // stored as "YYYY-MM-DD" from backend
+                    const rawVal = i[targetDateField];
 
-                    // If the record has no value for this date field, exclude it from
-                    // the filtered results only when a date range is active (makes sense
-                    // to not show records that have no date when the user is filtering by date)
                     if (!rawVal || rawVal.trim() === "" || rawVal === "N/A") return false;
 
-                    // Normalise to YYYY-MM-DD for safe string comparison
-                    // Backend already stores as YYYY-MM-DD, so this is a safety net
                     let normalised = rawVal;
                     if (rawVal.includes("-") && rawVal.length === 10) {
-                        // Already ISO: "YYYY-MM-DD"
                         normalised = rawVal;
                     } else {
-                        // Try to parse if in another format
                         const d = new Date(rawVal);
                         if (!isNaN(d.getTime())) {
                             normalised = d.toISOString().split("T")[0];
@@ -887,12 +887,9 @@
                 });
             }
 
-            // Determine effective sort field:
-            // If user picked one, use it; otherwise if a date range is active,
-            // auto-sort by the date column being filtered so results are ordered.
             let effectiveSortField = sortField;
             if (!effectiveSortField && (startDate || endDate)) {
-                effectiveSortField = targetDateField; // 'date', 'start', or 'end'
+                effectiveSortField = targetDateField;
             }
 
             if (effectiveSortField) {
@@ -904,7 +901,6 @@
                         valA = Number(valA) || 0;
                         valB = Number(valB) || 0;
                     } else if (['date', 'start', 'end'].includes(effectiveSortField)) {
-                        // Date comparison works fine with YYYY-MM-DD strings
                         valA = valA || "";
                         valB = valB || "";
                     } else if (typeof valA === 'string') {
