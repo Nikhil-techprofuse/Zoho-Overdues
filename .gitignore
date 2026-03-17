@@ -16,9 +16,9 @@ env/
 ENV/
 
 # Flask / SQLite database
-instance/
-*.db
-*.sqlite3
+#instance/
+#*.db
+#*.sqlite3
 
 # Uploads (user data)
 uploads/
