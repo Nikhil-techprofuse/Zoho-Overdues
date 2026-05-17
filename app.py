@@ -1,288 +1,309 @@
-from flask import Flask, render_template, request, jsonify, session
-from models import db, User, Invoice
+from collections import deque
+import sys
 
-# =====================================================
-# APP CONFIG
-# =====================================================
-
-app = Flask(__name__)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "secret123"
-
-db.init_app(app)
+MOD = 10**9 + 7
+NEG_INF = -10**60
 
 
-# =====================================================
-# DATABASE INITIALIZATION
-# =====================================================
+def max_net_profit(values, k, switch_cost):
+    n = len(values)
 
-with app.app_context():
-    db.create_all()
+    if n == 0:
+        return 0
 
-    # Create default users only once
-    if not User.query.first():
+    prefix = [0] * (n + 1)
+    for index, value in enumerate(values, start=1):
+        prefix[index] = prefix[index - 1] + value
 
-        users = [
-            User(username="admin", password="admin123", role="admin"),
-            User(username="srilakshmi", password="owner123", role="owner"),
-            User(username="sireesha", password="owner123", role="owner"),
-            User(username="vamsi", password="owner123", role="owner"),
-            User(username="vijay", password="owner123", role="owner"),
-            User(username="shravya", password="owner123", role="owner"),
-        ]
+    collect = [NEG_INF] * (n + 1)
+    skip = [NEG_INF] * (n + 1)
+    candidates = deque()
 
-        db.session.add_all(users)
-        db.session.commit()
+    for index in range(1, n + 1):
+        while candidates and candidates[0][0] < index - k:
+            candidates.popleft()
 
+        best_collect = prefix[index] if index <= k else NEG_INF
+        if candidates:
+            best_collect = max(best_collect, prefix[index] + candidates[0][1])
+        collect[index] = best_collect
 
-# =====================================================
-# HELPER — LOGIN REQUIRED CHECK
-# =====================================================
+        if index > 1:
+            skip[index] = max(skip[index - 1], collect[index - 1] - switch_cost)
 
-def require_login():
-    """Return True if user logged in else False"""
-    return "user" in session and "role" in session
+        candidate_value = skip[index] - switch_cost - prefix[index]
+        if candidate_value > NEG_INF // 2:
+            while candidates and candidates[-1][1] <= candidate_value:
+                candidates.pop()
+            candidates.append((index, candidate_value))
 
-
-# =====================================================
-# PAGE ROUTES
-# =====================================================
-
-@app.route("/")
-def home():
-    return render_template("index.html")
+    return max(collect[n], skip[n])
 
 
-@app.route("/dashboard")
-def dashboard_page():
-    if not require_login():
+def solve(data=None):
+    tokens = data.split() if data is not None else sys.stdin.buffer.read().split()
+
+    if not tokens:
+        return ""
+
+    n = int(tokens[0])
+    k = int(tokens[1])
+    switch_cost = int(tokens[2])
+    values = list(map(int, tokens[3:3 + n]))
+
+    if len(values) != n:
+        raise ValueError("Input array length does not match n")
+
+    return str(max_net_profit(values, k, switch_cost) % MOD)
+
+
+try:
+    from flask import Flask, jsonify, render_template, request, session
+    from models import Invoice, User, db
+except ModuleNotFoundError:
+    Flask = None
+    app = None
+else:
+    app = Flask(__name__)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SECRET_KEY"] = "secret123"
+
+    db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
+        if not User.query.first():
+            users = [
+                User(username="admin", password="admin123", role="admin"),
+                User(username="srilakshmi", password="owner123", role="owner"),
+                User(username="sireesha", password="owner123", role="owner"),
+                User(username="vamsi", password="owner123", role="owner"),
+                User(username="vijay", password="owner123", role="owner"),
+                User(username="shravya", password="owner123", role="owner"),
+            ]
+
+            db.session.add_all(users)
+            db.session.commit()
+
+    def require_login():
+        return "user" in session and "role" in session
+
+
+    @app.route("/")
+    def home():
         return render_template("index.html")
-    return render_template("dashboard.html")
 
 
-@app.route("/invoices-page")
-def invoices_page():
-    if not require_login():
-        return render_template("index.html")
-    return render_template("invoices.html")
+    @app.route("/dashboard")
+    def dashboard_page():
+        if not require_login():
+            return render_template("index.html")
+        return render_template("dashboard.html")
 
 
-@app.route("/customers-page")
-def customers_page():
-    if not require_login():
-        return render_template("index.html")
-    return render_template("customers.html")
+    @app.route("/invoices-page")
+    def invoices_page():
+        if not require_login():
+            return render_template("index.html")
+        return render_template("invoices.html")
 
 
-# =====================================================
-# LOGIN API
-# =====================================================
-
-@app.route("/login", methods=["POST"])
-def login():
-
-    data = request.get_json()
-
-    username = data.get("username")
-    password = data.get("password")
-
-    user = User.query.filter_by(
-        username=username,
-        password=password
-    ).first()
-
-    if not user:
-        return jsonify({"message": "Invalid credentials"}), 401
-
-    # Store session
-    session["user"] = user.username
-    session["role"] = user.role
-
-    return jsonify({
-        "message": "Login successful",
-        "user": user.username,
-        "role": user.role
-    }), 200
+    @app.route("/customers-page")
+    def customers_page():
+        if not require_login():
+            return render_template("index.html")
+        return render_template("customers.html")
 
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return jsonify({"success": True})
+    @app.route("/login", methods=["POST"])
+    def login():
+        data = request.get_json()
+
+        username = data.get("username")
+        password = data.get("password")
+
+        user = User.query.filter_by(
+            username=username,
+            password=password
+        ).first()
+
+        if not user:
+            return jsonify({"message": "Invalid credentials"}), 401
+
+        session["user"] = user.username
+        session["role"] = user.role
+
+        return jsonify({
+            "message": "Login successful",
+            "user": user.username,
+            "role": user.role
+        }), 200
 
 
-# =====================================================
-# DASHBOARD DATA API
-# =====================================================
-
-@app.route("/dashboard-data")
-def dashboard_data():
-
-    if not require_login():
-        return jsonify({"error": "Unauthorized"}), 401
-
-    role = session["role"]
-    username = session["user"]
-
-    query = Invoice.query
-
-    # Owner restriction
-    if role != "admin":
-        query = query.filter_by(owner=username)
-
-    invoices = query.all()
-
-    total_value = sum(i.amount or 0 for i in invoices)
-    total_due = sum(i.balance_due or 0 for i in invoices)
-    total_invoices = len(invoices)
-    unique_customers = len(set(i.customer for i in invoices if i.customer))
-
-    return jsonify({
-        "totalValue": total_value,
-        "totalDue": total_due,
-        "totalInvoices": total_invoices,
-        "uniqueCustomers": unique_customers
-    })
+    @app.route("/logout")
+    def logout():
+        session.clear()
+        return jsonify({"success": True})
 
 
-# =====================================================
-# INVOICES API
-# =====================================================
+    @app.route("/dashboard-data")
+    def dashboard_data():
+        if not require_login():
+            return jsonify({"error": "Unauthorized"}), 401
 
-@app.route("/invoices")
-def invoices():
+        role = session["role"]
+        username = session["user"]
 
-    if not require_login():
-        return jsonify({"error": "Unauthorized"}), 401
+        query = Invoice.query
 
-    role = session["role"]
-    username = session["user"]
+        if role != "admin":
+            query = query.filter_by(owner=username)
 
-    query = Invoice.query
+        invoices = query.all()
 
-    if role != "admin":
-        query = query.filter_by(owner=username)
+        total_value = sum(invoice.amount or 0 for invoice in invoices)
+        total_due = sum(invoice.balance_due or 0 for invoice in invoices)
+        total_invoices = len(invoices)
+        unique_customers = len(set(invoice.customer for invoice in invoices if invoice.customer))
 
-    invoices = query.all()
-
-    result = [{
-        "invoice": i.transaction_no,
-        "customer": i.customer,
-        "amount": i.amount,
-        "due": i.balance_due,
-        "start": i.start_date,
-        "end": i.end_date,
-        "ageing": i.ageing,
-        "owner": i.owner,
-        "status": i.status
-    } for i in invoices]
-
-    return jsonify(result)
-
-
-# =====================================================
-# UNIQUE CUSTOMERS API
-# =====================================================
-
-@app.route("/customers-data")
-def customers_data():
-
-    if not require_login():
-        return jsonify({"error": "Unauthorized"}), 401
-
-    role = session["role"]
-    username = session["user"]
-
-    query = Invoice.query
-
-    if role != "admin":
-        query = query.filter_by(owner=username)
-
-    invoices = query.all()
-
-    customers = {}
-
-    for i in invoices:
-
-        if not i.customer:
-            continue
-
-        if i.customer not in customers:
-            customers[i.customer] = {
-                "customer": i.customer,
-                "total_due": 0,
-                "invoices": []
-            }
-
-        customers[i.customer]["total_due"] += i.balance_due or 0
-
-        customers[i.customer]["invoices"].append({
-            "invoice": i.transaction_no,
-            "amount": i.amount,
-            "due": i.balance_due,
-            "status": i.status,
-            "owner": i.owner
+        return jsonify({
+            "totalValue": total_value,
+            "totalDue": total_due,
+            "totalInvoices": total_invoices,
+            "uniqueCustomers": unique_customers
         })
 
-    return jsonify(list(customers.values()))
 
-#--- AGENT WISE DATA ---
+    @app.route("/invoices")
+    def invoices():
+        if not require_login():
+            return jsonify({"error": "Unauthorized"}), 401
 
-@app.route("/agent-page")
-def agent_page():
-    if not require_login():
-        return render_template("index.html")
-    return render_template("agent.html")
+        role = session["role"]
+        username = session["user"]
 
-@app.route("/agent-data")
-def agent_data():
+        query = Invoice.query
 
-    if not require_login():
-        return jsonify({"error":"Unauthorized"}),401
+        if role != "admin":
+            query = query.filter_by(owner=username)
 
-    role = session["role"]
-    username = session["user"]
+        all_invoices = query.all()
 
-    query = Invoice.query
+        result = [{
+            "invoice": invoice.transaction_no,
+            "customer": invoice.customer,
+            "amount": invoice.amount,
+            "due": invoice.balance_due,
+            "start": invoice.start_date,
+            "end": invoice.end_date,
+            "ageing": invoice.ageing,
+            "owner": invoice.owner,
+            "status": invoice.status
+        } for invoice in all_invoices]
 
-    if role != "admin":
-        query = query.filter_by(owner=username)
+        return jsonify(result)
 
-    invoices = query.all()
 
-    agents = {}
+    @app.route("/customers-data")
+    def customers_data():
+        if not require_login():
+            return jsonify({"error": "Unauthorized"}), 401
 
-    for i in invoices:
+        role = session["role"]
+        username = session["user"]
 
-        if not i.owner:
-            continue
+        query = Invoice.query
 
-        if i.owner not in agents:
-            agents[i.owner] = {
-                "owner": i.owner,
-                "total_amount":0,
-                "total_due":0,
-                "invoice_count":0,
-                "invoices":[]
-            }
+        if role != "admin":
+            query = query.filter_by(owner=username)
 
-        agents[i.owner]["total_amount"] += i.amount or 0
-        agents[i.owner]["total_due"] += i.balance_due or 0
-        agents[i.owner]["invoice_count"] += 1
+        all_invoices = query.all()
+        customers = {}
 
-        agents[i.owner]["invoices"].append({
-            "invoice": i.transaction_no,
-            "customer": i.customer,
-            "due": i.balance_due
-        })
+        for invoice in all_invoices:
+            if not invoice.customer:
+                continue
 
-    return jsonify(list(agents.values()))
+            if invoice.customer not in customers:
+                customers[invoice.customer] = {
+                    "customer": invoice.customer,
+                    "total_due": 0,
+                    "invoices": []
+                }
 
-# =====================================================
-# RUN APP
-# =====================================================
+            customers[invoice.customer]["total_due"] += invoice.balance_due or 0
+            customers[invoice.customer]["invoices"].append({
+                "invoice": invoice.transaction_no,
+                "amount": invoice.amount,
+                "due": invoice.balance_due,
+                "status": invoice.status,
+                "owner": invoice.owner
+            })
+
+        return jsonify(list(customers.values()))
+
+
+    @app.route("/agent-page")
+    def agent_page():
+        if not require_login():
+            return render_template("index.html")
+        return render_template("agent.html")
+
+
+    @app.route("/agent-data")
+    def agent_data():
+        if not require_login():
+            return jsonify({"error": "Unauthorized"}), 401
+
+        role = session["role"]
+        username = session["user"]
+
+        query = Invoice.query
+
+        if role != "admin":
+            query = query.filter_by(owner=username)
+
+        all_invoices = query.all()
+        agents = {}
+
+        for invoice in all_invoices:
+            if not invoice.owner:
+                continue
+
+            if invoice.owner not in agents:
+                agents[invoice.owner] = {
+                    "owner": invoice.owner,
+                    "total_amount": 0,
+                    "total_due": 0,
+                    "invoice_count": 0,
+                    "invoices": []
+                }
+
+            agents[invoice.owner]["total_amount"] += invoice.amount or 0
+            agents[invoice.owner]["total_due"] += invoice.balance_due or 0
+            agents[invoice.owner]["invoice_count"] += 1
+            agents[invoice.owner]["invoices"].append({
+                "invoice": invoice.transaction_no,
+                "customer": invoice.customer,
+                "due": invoice.balance_due
+            })
+
+        return jsonify(list(agents.values()))
+
+
+def run_flask_app():
+    if app is None:
+        raise RuntimeError("Flask dependencies are not available")
+    app.run(debug=True)
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    if sys.stdin.isatty():
+        run_flask_app()
+    else:
+        result = solve()
+        if result:
+            sys.stdout.write(result)
