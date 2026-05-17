@@ -5,6 +5,7 @@ import sys
 
 MOD = 10**9 + 7
 NEG_INF = -10**60
+HASH_PREFIXES = ("pbkdf2:", "scrypt:")
 
 
 def max_net_profit(values, k, switch_cost):
@@ -59,6 +60,32 @@ def solve(data=None):
     return str(max_net_profit(values, k, switch_cost) % MOD)
 
 
+def is_password_hash(value):
+    return isinstance(value, str) and value.startswith(HASH_PREFIXES)
+
+
+def load_secret_key():
+    configured_key = os.environ.get("SECRET_KEY")
+    if configured_key:
+        return configured_key
+
+    key_path = os.path.join(os.path.dirname(__file__), ".flask_secret_key")
+    if os.path.exists(key_path):
+        with open(key_path, "r", encoding="utf-8") as key_file:
+            stored_key = key_file.read().strip()
+        if stored_key:
+            return stored_key
+
+    generated_key = secrets.token_hex(32)
+    with open(key_path, "w", encoding="utf-8") as key_file:
+        key_file.write(generated_key)
+    return generated_key
+
+
+def env_flag(name):
+    return os.environ.get(name, "0").strip().lower() in {"1", "true", "yes", "on"}
+
+
 try:
     from flask import Flask, jsonify, render_template, request, session
     from models import Invoice, User, db
@@ -71,12 +98,21 @@ else:
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
+    app.config["SECRET_KEY"] = load_secret_key()
 
     db.init_app(app)
 
     with app.app_context():
         db.create_all()
+
+        updated_users = False
+        for user in User.query.all():
+            if not is_password_hash(user.password):
+                user.password = generate_password_hash(user.password)
+                updated_users = True
+
+        if updated_users:
+            db.session.commit()
 
         if not User.query.first():
             users = [
@@ -131,7 +167,7 @@ else:
         user = User.query.filter_by(username=username).first()
 
         if not user or not (
-            user.password == password or check_password_hash(user.password, password)
+            is_password_hash(user.password) and check_password_hash(user.password, password)
         ):
             return jsonify({"message": "Invalid credentials"}), 401
 
@@ -299,7 +335,7 @@ else:
 def run_flask_app():
     if app is None:
         raise RuntimeError("Flask dependencies are not available")
-    app.run(debug=os.environ.get("FLASK_DEBUG") == "1")
+    app.run(debug=env_flag("FLASK_DEBUG"))
 
 
 if __name__ == "__main__":
