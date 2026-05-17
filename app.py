@@ -1,4 +1,6 @@
 from collections import deque
+import os
+import secrets
 import sys
 
 MOD = 10**9 + 7
@@ -60,6 +62,7 @@ def solve(data=None):
 try:
     from flask import Flask, jsonify, render_template, request, session
     from models import Invoice, User, db
+    from werkzeug.security import check_password_hash, generate_password_hash
 except ModuleNotFoundError:
     Flask = None
     app = None
@@ -68,7 +71,7 @@ else:
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SECRET_KEY"] = "secret123"
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
     db.init_app(app)
 
@@ -77,12 +80,12 @@ else:
 
         if not User.query.first():
             users = [
-                User(username="admin", password="admin123", role="admin"),
-                User(username="srilakshmi", password="owner123", role="owner"),
-                User(username="sireesha", password="owner123", role="owner"),
-                User(username="vamsi", password="owner123", role="owner"),
-                User(username="vijay", password="owner123", role="owner"),
-                User(username="shravya", password="owner123", role="owner"),
+                User(username="admin", password=generate_password_hash("admin123"), role="admin"),
+                User(username="srilakshmi", password=generate_password_hash("owner123"), role="owner"),
+                User(username="sireesha", password=generate_password_hash("owner123"), role="owner"),
+                User(username="vamsi", password=generate_password_hash("owner123"), role="owner"),
+                User(username="vijay", password=generate_password_hash("owner123"), role="owner"),
+                User(username="shravya", password=generate_password_hash("owner123"), role="owner"),
             ]
 
             db.session.add_all(users)
@@ -125,12 +128,11 @@ else:
         username = data.get("username")
         password = data.get("password")
 
-        user = User.query.filter_by(
-            username=username,
-            password=password
-        ).first()
+        user = User.query.filter_by(username=username).first()
 
-        if not user:
+        if not user or not (
+            user.password == password or check_password_hash(user.password, password)
+        ):
             return jsonify({"message": "Invalid credentials"}), 401
 
         session["user"] = user.username
@@ -297,11 +299,11 @@ else:
 def run_flask_app():
     if app is None:
         raise RuntimeError("Flask dependencies are not available")
-    app.run(debug=True)
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1")
 
 
 if __name__ == "__main__":
-    if sys.stdin.isatty():
+    if len(sys.argv) > 1 and sys.argv[1] == "serve":
         run_flask_app()
     else:
         result = solve()
